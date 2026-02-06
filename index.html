@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="imagem\IG_64x64.png">
+  <link rel="stylesheet" href="css/style.css?v=2.0">
+  
+  <title>VoidNix — Loja</title>
+  <meta name="description" content="VoidNix — Street Style. Loja online de roupas urbanas e acessórios.">
+
+  <!-- Appwrite SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
+  
+  <!-- Firebase (para autenticação) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
+</head>
+<body>
+
+<header>
+  <div class="container topbar">
+    <div class="brand">
+      <img src="imagem\IG.png" alt="VoidNix Logo" class="logo">
+      <div>
+        <div>VoidNix</div>
+        <div class="tagline">Street Style</div>
+      </div>
+    </div>
+
+    <nav aria-label="Navegação principal">
+      <div class="nav-links">
+        <a href="#loja" class="active" aria-current="page">Loja</a>
+        <a href="#novidades">Novidades</a>
+        <a href="#ofertas">Ofertas</a>
+      </div>
+    </nav>
+
+    <div class="search-cart">
+      <label class="search" for="searchInput">
+        <span class="sr-only">Pesquisar produtos</span>
+        <input type="search" id="searchInput" placeholder="Procurar roupas..." aria-label="Pesquisar produtos">
+      </label>
+      <button class="user-btn" id="userBtn" aria-label="Conta de utilizador">
+        <span id="userIcon">👤</span>
+      </button>
+      <button class="cart-btn" id="openCart" aria-label="Abrir carrinho">
+        Carrinho (<span id="cartCount">0</span>)
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="main-controls">
+    <div class="tabs" role="tablist" aria-label="Categorias de produtos">
+      <button class="tab active" role="tab" data-tab="all" aria-selected="true">Tudo</button>
+      <button class="tab" role="tab" data-tab="women" aria-selected="false">Mulher</button>
+      <button class="tab" role="tab" data-tab="men" aria-selected="false">Homem</button>
+      <button class="tab" role="tab" data-tab="accessories" aria-selected="false">Acessórios</button>
+      <button class="tab" role="tab" data-tab="sale" aria-selected="false">Promoções</button>
+    </div>
+
+    <div class="filters-inline">
+      <button class="filter-btn" id="filterToggle">
+        Filtros <span class="arrow">→</span>
+      </button>
+      <div class="filter-dropdown" id="filterDropdown">
+        <label>
+          <input type="checkbox" id="filterNew" value="new" class="filter-checkbox">
+          <span>Novidades</span>
+        </label>
+        <label>
+          <input type="checkbox" id="filterSale" value="sale" class="filter-checkbox">
+          <span>Em promoção</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <section aria-live="polite" aria-atomic="true" class="products-section">
+      <div id="productCount" class="product-count"></div>
+      <div class="product-grid" id="products" role="list"></div>
+      <div id="noResults" class="no-results" style="display: none;">
+        <p>Nenhum produto encontrado.</p>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <div>
+        <strong>VoidNix</strong>
+        <div class="muted">© 2025 VoidNix. Todos os direitos reservados.</div>
+      </div>
+      <div class="muted footer-links">
+        <a href="#suporte">Suporte</a> ·
+        <a href="#privacidade">Privacidade</a> ·
+        <a href="#termos">Termos</a>
+      </div>
+    </div>
+  </footer>
+</main>
+
+<!-- Carrinho lateral -->
+<aside class="cart-drawer" id="cartDrawer" role="complementary" aria-label="Carrinho de compras" aria-hidden="true">
+  <div class="cart-header">
+    <h2>Carrinho</h2>
+    <button id="closeCart" class="close-btn" aria-label="Fechar carrinho">✕</button>
+  </div>
+  
+  <div id="cartItems" class="cart-items-container"></div>
+  
+  <div id="emptyCart" class="empty-cart" style="display: none;">
+    <p>Seu carrinho está vazio</p>
+  </div>
+  
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span class="muted">Total</span>
+      <span id="cartTotal" class="cart-total">€0.00</span>
+    </div>
+    <button class="btn checkout-btn" id="checkoutBtn" disabled>Finalizar compra</button>
+  </div>
+</aside>
+
+<div class="overlay" id="cartOverlay" aria-hidden="true"></div>
+<div class="overlay" id="modalOverlay" aria-hidden="true"></div>
+<div class="overlay" id="loginOverlay" aria-hidden="true"></div>
+
+<!-- Modal de login/registro -->
+<div class="login-modal" id="loginModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="login-content">
+    <button id="closeLogin" class="close-btn" aria-label="Fechar">✕</button>
+    
+    <!-- Formulário de Login -->
+    <div class="login-form" id="loginForm">
+      <div class="login-header">
+        <h2>Entrar</h2>
+        <p class="login-subtitle">Bem-vindo de volta à VoidNix</p>
+      </div>
+      
+      <form id="loginFormElement">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="loginPassword">Palavra-passe</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required>
+        </div>
+        
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="rememberMe">
+            <span>Lembrar-me</span>
+          </label>
+          <a href="#" class="link-text" id="forgotPassword">Esqueceu a palavra-passe?</a>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-full">Entrar</button>
+      </form>
+      
+      <div class="form-divider">
+        <span>ou</span>
+      </div>
+      
+      <div class="social-login">
+        <button class="btn-social btn-google">
+          <span class="social-icon">G</span>
+          Continuar com Google
+        </button>
+      </div>
+      
+      <div class="form-footer">
+        <p>Não tem conta? <a href="#" class="link-text" id="showRegister">Criar conta</a></p>
+      </div>
+    </div>
+    
+    <!-- Formulário de Registro -->
+    <div class="register-form" id="registerForm" style="display: none;">
+      <div class="login-header">
+        <h2>Criar Conta</h2>
+        <p class="login-subtitle">Junte-se à comunidade VoidNix</p>
+      </div>
+      
+      <form id="registerFormElement">
+        <div class="form-group">
+          <label for="registerName">Nome Completo</label>
+          <input type="text" id="registerName" placeholder="João Silva" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" placeholder="seu@email.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="registerPassword">Palavra-passe</label>
+          <input type="password" id="registerPassword" placeholder="••••••••" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="registerConfirmPassword">Confirmar Palavra-passe</label>
+          <input type="password" id="registerConfirmPassword" placeholder="••••••••" required>
+        </div>
+        
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="acceptTerms" required>
+            <span>Aceito os <a href="#" class="link-text">termos e condições</a></span>
+          </label>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-full">Criar Conta</button>
+      </form>
+      
+      <div class="form-divider">
+        <span>ou</span>
+      </div>
+      
+      <div class="social-login">
+        <button class="btn-social btn-google">
+          <span class="social-icon">G</span>
+          Continuar com Google
+        </button>
+      </div>
+      
+      <div class="form-footer">
+        <p>Já tem conta? <a href="#" class="link-text" id="showLogin">Entrar</a></p>
+      </div>
+    </div>
+    
+    <!-- Perfil do utilizador (quando logado) -->
+    <div class="user-profile" id="userProfile" style="display: none;">
+      <div class="login-header">
+        <h2>Minha Conta</h2>
+        <p class="login-subtitle" id="userGreeting">Olá, utilizador!</p>
+      </div>
+      
+      <div class="profile-menu">
+        <!-- Opção de Admin (só aparece para admin) -->
+        <a href="admin.html" class="profile-menu-item admin-only" id="adminPanelBtn" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+          <span class="menu-icon">👑</span>
+          <div>
+            <div class="menu-title" style="color: white; font-weight: 600;">Painel de Administração</div>
+            <div class="menu-desc" style="color: rgba(255,255,255,0.9);">Gerir produtos e encomendas</div>
+          </div>
+        </a>
+        
+        <a href="#" class="profile-menu-item" id="showOrdersBtn">
+          <span class="menu-icon">📦</span>
+          <div>
+            <div class="menu-title">Minhas Encomendas</div>
+            <div class="menu-desc">Ver histórico de compras</div>
+          </div>
+        </a>
+        
+        <a href="#" class="profile-menu-item" id="showInvoicesBtn">
+          <span class="menu-icon">🧾</span>
+          <div>
+            <div class="menu-title">Faturas</div>
+            <div class="menu-desc">Ver e baixar faturas</div>
+          </div>
+        </a>
+        
+        <a href="#" class="profile-menu-item" id="showWishlistBtn" id="showWishlistBtn">
+          <span class="menu-icon">❤️</span>
+          <div>
+            <div class="menu-title">Lista de Desejos</div>
+            <div class="menu-desc">Produtos favoritos</div>
+          </div>
+        </a>
+        
+        <a href="#" class="profile-menu-item" id="showAddressesBtn">
+          <span class="menu-icon">📍</span>
+          <div>
+            <div class="menu-title">Endereços</div>
+            <div class="menu-desc">Gerir moradas de entrega</div>
+          </div>
+        </a>
+        
+        <a href="#" class="profile-menu-item" id="showSettingsBtn">
+          <span class="menu-icon">⚙️</span>
+          <div>
+            <div class="menu-title">Definições</div>
+            <div class="menu-desc">Dados pessoais e preferências</div>
+          </div>
+        </a>
+      </div>
+      
+      <button class="btn btn-secondary btn-full" id="logoutBtn">Terminar Sessão</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de detalhes do produto -->
+<div class="product-modal" id="productModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <!-- Conteúdo será inserido dinamicamente pelo JavaScript -->
+</div>
+
+<!-- Modal de Encomendas -->
+<div class="profile-modal" id="ordersModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="profile-modal-content">
+    <div class="profile-modal-header">
+      <h2><span>📦</span> Minhas Encomendas</h2>
+      <button class="close-btn" id="closeOrdersModal" aria-label="Fechar">✕</button>
+    </div>
+    <div class="profile-modal-body" id="ordersContent">
+      <!-- Conteúdo será inserido dinamicamente -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Faturas -->
+<div class="profile-modal" id="invoicesModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="profile-modal-content">
+    <div class="profile-modal-header">
+      <h2><span>🧾</span> Minhas Faturas</h2>
+      <button class="close-btn" id="closeInvoicesModal" aria-label="Fechar">✕</button>
+    </div>
+    <div class="profile-modal-body" id="invoicesContent">
+      <!-- Conteúdo será inserido dinamicamente -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Lista de Desejos -->
+<div class="profile-modal" id="wishlistModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="profile-modal-content">
+    <div class="profile-modal-header">
+      <h2><span>❤️</span> Lista de Desejos</h2>
+      <button class="close-btn" id="closeWishlistModal" aria-label="Fechar">✕</button>
+    </div>
+    <div class="profile-modal-body" id="wishlistContent">
+      <!-- Conteúdo será inserido dinamicamente -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Definições -->
+<div class="profile-modal" id="settingsModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="profile-modal-content">
+    <div class="profile-modal-header">
+      <h2><span>⚙️</span> Definições</h2>
+      <button class="close-btn" id="closeSettingsModal" aria-label="Fechar">✕</button>
+    </div>
+    <div class="profile-modal-body" id="settingsContent">
+      <!-- Conteúdo será inserido dinamicamente -->
+    </div>
+  </div>
+</div>
+
+<script src="js/appwrite-config.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/invoices.js"></script>
+<script src="js/index.js"></script>
+</body>
+</html>

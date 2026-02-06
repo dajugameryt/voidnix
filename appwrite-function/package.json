@@ -1,0 +1,12 @@
+{
+  "name": "stripe-checkout",
+  "version": "1.0.0",
+  "description": "Appwrite Function para criar sessões de checkout do Stripe",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "stripe": "^14.0.0"
+  }
+}
