@@ -1081,10 +1081,10 @@ async function handleCheckout() {
             }
         }
         
-        // Fallback: usar backend local
+        // Fallback: usar backend Vercel
         if (!checkoutUrl) {
-            console.log('🔄 Usando backend local como fallback...');
-            const response = await fetch('http://localhost:3000/create-checkout-session', {
+            console.log('🔄 Usando backend Vercel como fallback...');
+            const response = await fetch('/api/create-checkout-session', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1103,7 +1103,7 @@ async function handleCheckout() {
             
             if (data.url) {
                 checkoutUrl = data.url;
-                console.log('✅ Usando backend local');
+                console.log('✅ Usando backend Vercel');
             } else {
                 throw new Error('Nenhum método de checkout disponível');
             }
