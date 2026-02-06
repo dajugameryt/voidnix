@@ -1,0 +1,13 @@
+{
+  "name": "voidnix",
+  "version": "1.0.0",
+  "description": "VoidNix - Loja de Roupa Online",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Build complete'"
+  },
+  "dependencies": {
+    "stripe": "^14.0.0",
+    "nodemailer": "^7.0.10"
+  }
+}
