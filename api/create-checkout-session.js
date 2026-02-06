@@ -17,9 +17,17 @@ module.exports = async (req, res) => {
   try {
     const { lineItems, customerEmail } = req.body;
 
+    if (!lineItems || !customerEmail) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
     console.log('📦 Criando sessão de checkout...');
     console.log('Items:', lineItems?.length);
     console.log('Email:', customerEmail);
+
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return res.status(500).json({ error: 'Stripe not configured' });
+    }
 
     // Criar sessão de checkout no Stripe
     const session = await stripe.checkout.sessions.create({
@@ -27,8 +35,8 @@ module.exports = async (req, res) => {
       line_items: lineItems,
       mode: 'payment',
       customer_email: customerEmail,
-      success_url: `${req.headers.origin || 'https://voidnix.vercel.app'}/index.html?payment=success`,
-      cancel_url: `${req.headers.origin || 'https://voidnix.vercel.app'}/index.html?payment=cancel`,
+      success_url: `https://voidnix.vercel.app/index.html?payment=success`,
+      cancel_url: `https://voidnix.vercel.app/index.html?payment=cancel`,
       billing_address_collection: 'required',
       shipping_address_collection: {
         allowed_countries: ['PT', 'ES', 'FR', 'DE', 'IT', 'GB', 'US'],
@@ -37,13 +45,13 @@ module.exports = async (req, res) => {
 
     console.log('✅ Sessão criada:', session.id);
 
-    res.status(200).json({ 
+    return res.status(200).json({ 
       sessionId: session.id,
       url: session.url 
     });
 
   } catch (error) {
     console.error('❌ Erro:', error.message);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
