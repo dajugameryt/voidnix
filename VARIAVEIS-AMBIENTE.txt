@@ -1,0 +1,13 @@
+# Variáveis de Ambiente para Vercel
+# Copiar e colar na Vercel
+
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+EMAIL_USER=voidnix.clothes@gmail.com
+EMAIL_PASS=sua_app_password_do_gmail
+NODE_ENV=production
+
+# IMPORTANTE:
+# - STRIPE_SECRET_KEY: Pegar no Stripe Dashboard
+# - STRIPE_WEBHOOK_SECRET: Criar webhook na Vercel depois do deploy
+# - EMAIL_PASS: Criar App Password no Gmail (não é a password normal!)
