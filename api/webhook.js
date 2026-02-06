@@ -1,16 +1,32 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const nodemailer = require('nodemailer');
 
+// Desabilitar body parsing automático da Vercel
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+async function buffer(readable) {
+  const chunks = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const sig = req.headers['stripe-signature'];
+  const buf = await buffer(req);
   
   try {
     const event = stripe.webhooks.constructEvent(
-      req.body, 
+      buf, 
       sig, 
       process.env.STRIPE_WEBHOOK_SECRET
     );
