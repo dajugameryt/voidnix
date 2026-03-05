@@ -1208,7 +1208,7 @@ function showUserProfile() {
 async function handleLogin(e) {
     e.preventDefault();
     
-    const email = document.getElementById('loginEmail').value;
+    const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
     const rememberMe = document.getElementById('rememberMe').checked;
     
@@ -1217,10 +1217,23 @@ async function handleLogin(e) {
         return;
     }
     
-    // Verificar se é admin
-    const isAdmin = (email === 'danielcac19@gmail.com' && password === '6971david');
+    // Validação básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert('❌ Por favor, insira um email válido.');
+        return;
+    }
     
-    // Login com Appwrite
+    // Lista de contas de emergência (APENAS para quando Appwrite estiver offline)
+    const emergencyAccounts = {
+        'danielcac19@gmail.com': '6971david',
+        'admin@voidnix.pt': 'admin123'
+    };
+    
+    // Verificar se é admin
+    const isAdmin = (email === 'danielcac19@gmail.com');
+    
+    // Login com Appwrite (método principal)
     if (account) {
         try {
             console.log('🔐 Fazendo login no Appwrite...');
@@ -1228,7 +1241,7 @@ async function handleLogin(e) {
             // Criar sessão de email
             await account.createEmailSession(email, password);
             
-            console.log('✅ Login realizado');
+            console.log('✅ Login realizado com sucesso');
             
             // Obter dados do usuário
             const userData = await account.get();
@@ -1252,75 +1265,98 @@ async function handleLogin(e) {
             // Limpar formulário
             document.getElementById('loginFormElement').reset();
             
-            // Fechar modal após 1 segundo
+            // Fechar modal
             setTimeout(() => {
                 closeLoginModal();
+                if (isAdmin) {
+                    console.log('👑 Admin autenticado');
+                }
             }, 500);
             
         } catch (error) {
-            console.error('❌ Erro ao fazer login:', error);
+            console.error('❌ Erro ao fazer login no Appwrite:', error);
             
-            // Se for erro de conexão, usar modo local
-            if (error.message.includes('fetch') || error.message.includes('network') || !error.code) {
-                console.warn('⚠️ Appwrite não disponível, usando modo local');
+            // Se for erro de rede/conexão E a conta estiver na lista de emergência
+            if ((error.message.includes('fetch') || error.message.includes('network') || !error.code)) {
+                console.warn('⚠️ Appwrite indisponível, verificando credenciais de emergência...');
                 
-                // Login local
-                const user = {
-                    name: email.split('@')[0],
-                    email: email,
-                    loginDate: new Date().toISOString(),
-                    isAdmin: isAdmin
-                };
-                
-                state.user = user;
-                
-                if (rememberMe) {
-                    localStorage.setItem('voidnix-user', JSON.stringify(user));
+                // Validar credenciais de emergência
+                if (emergencyAccounts[email] && emergencyAccounts[email] === password) {
+                    console.log('✅ Login de emergência bem-sucedido');
+                    
+                    const user = {
+                        name: email.split('@')[0],
+                        email: email,
+                        loginDate: new Date().toISOString(),
+                        isAdmin: isAdmin,
+                        emergencyMode: true
+                    };
+                    
+                    state.user = user;
+                    
+                    if (rememberMe) {
+                        localStorage.setItem('voidnix-user', JSON.stringify(user));
+                    }
+                    
+                    updateUserUI();
+                    showUserProfile();
+                    document.getElementById('loginFormElement').reset();
+                    
+                    alert('⚠️ Login de emergência ativado. Algumas funcionalidades podem estar limitadas.');
+                    
+                    setTimeout(() => {
+                        closeLoginModal();
+                    }, 500);
+                } else {
+                    alert('❌ Appwrite está offline e as suas credenciais não estão autorizadas para login de emergência.\n\nPor favor, tente novamente mais tarde ou contacte o suporte.');
                 }
-                
-                updateUserUI();
-                showUserProfile();
-                document.getElementById('loginFormElement').reset();
-                
-                setTimeout(() => {
-                    closeLoginModal();
-                }, 500);
             } else if (error.code === 401) {
-                alert('❌ Email ou palavra-passe inválidos.');
+                alert('❌ Email ou palavra-passe incorretos.\n\nPor favor, verifique os seus dados e tente novamente.');
             } else {
                 alert(`❌ Erro ao fazer login: ${error.message}`);
             }
         }
     } else {
-        // Fallback para modo local
-        const user = {
-            name: email.split('@')[0],
-            email: email,
-            loginDate: new Date().toISOString(),
-            isAdmin: isAdmin
-        };
+        // Appwrite não inicializado - exigir credenciais de emergência
+        console.warn('⚠️ Appwrite não configurado');
         
-        state.user = user;
-        
-        if (rememberMe) {
-            localStorage.setItem('voidnix-user', JSON.stringify(user));
+        if (emergencyAccounts[email] && emergencyAccounts[email] === password) {
+            console.log('✅ Login de emergência (Appwrite não configurado)');
+            
+            const user = {
+                name: email.split('@')[0],
+                email: email,
+                loginDate: new Date().toISOString(),
+                isAdmin: isAdmin,
+                emergencyMode: true
+            };
+            
+            state.user = user;
+            
+            if (rememberMe) {
+                localStorage.setItem('voidnix-user', JSON.stringify(user));
+            }
+            
+            updateUserUI();
+            showUserProfile();
+            document.getElementById('loginFormElement').reset();
+            
+            alert('⚠️ Sistema em modo de emergência. Funcionalidade limitada.');
+            
+            setTimeout(() => {
+                closeLoginModal();
+            }, 500);
+        } else {
+            alert('❌ Credenciais inválidas.\n\nO sistema de autenticação não está disponível. Contacte o administrador.');
         }
-        
-        updateUserUI();
-        showUserProfile();
-        document.getElementById('loginFormElement').reset();
-        
-        setTimeout(() => {
-            closeLoginModal();
-        }, 500);
     }
 }
 
 async function handleRegister(e) {
     e.preventDefault();
     
-    const name = document.getElementById('registerName').value;
-    const email = document.getElementById('registerEmail').value;
+    const name = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
     const password = document.getElementById('registerPassword').value;
     const confirmPassword = document.getElementById('registerConfirmPassword').value;
     const acceptTerms = document.getElementById('acceptTerms').checked;
@@ -1330,31 +1366,47 @@ async function handleRegister(e) {
         return;
     }
     
+    // Validação de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert('❌ Por favor, insira um email válido.');
+        return;
+    }
+    
     if (password !== confirmPassword) {
-        alert('As palavras-passe não coincidem.');
+        alert('❌ As palavras-passe não coincidem.');
         return;
     }
     
     if (password.length < 8) {
-        alert('A palavra-passe deve ter no mínimo 8 caracteres.');
+        alert('❌ A palavra-passe deve ter no mínimo 8 caracteres.');
+        return;
+    }
+    
+    // Validação de força de password
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    
+    if (!hasUpperCase || !hasLowerCase || !hasNumber) {
+        alert('❌ A palavra-passe deve conter:\n- Pelo menos uma letra maiúscula\n- Pelo menos uma letra minúscula\n- Pelo menos um número');
         return;
     }
     
     if (!acceptTerms) {
-        alert('Por favor, aceite os termos e condições.');
+        alert('❌ Por favor, aceite os termos e condições para continuar.');
         return;
     }
     
-    // Registrar com Appwrite
+    // Registrar com Appwrite (método obrigatório)
     if (account) {
         try {
             console.log('🔐 Criando conta no Appwrite...');
             
-            // Criar conta no Appwrite
-            const userId = 'unique()';
-            const newAccount = await account.create(userId, email, password, name);
+            // Criar conta no Appwrite (ID único automático)
+            const newAccount = await account.create('unique()', email, password, name);
             
-            console.log('✅ Conta criada:', newAccount);
+            console.log('✅ Conta criada com sucesso:', newAccount);
             
             // Fazer login automático após registro
             await account.createEmailSession(email, password);
@@ -1368,13 +1420,14 @@ async function handleRegister(e) {
                 $id: userData.$id,
                 name: userData.name,
                 email: userData.email,
-                loginDate: new Date().toISOString()
+                loginDate: new Date().toISOString(),
+                isAdmin: false
             };
             
             localStorage.setItem('voidnix-user', JSON.stringify(state.user));
             updateUserUI();
             
-            alert(`✅ Conta criada com sucesso! Bem-vindo, ${name}!`);
+            alert(`✅ Conta criada com sucesso!\n\nBem-vindo à VoidNix, ${name}!`);
             
             // Limpar formulário
             document.getElementById('registerFormElement').reset();
@@ -1382,65 +1435,50 @@ async function handleRegister(e) {
             // Fechar modal
             setTimeout(() => {
                 closeLoginModal();
-            }, 500);
+            }, 800);
             
         } catch (error) {
-            console.error('❌ Erro ao criar conta no Appwrite:', error);
+            console.error('❌ Erro ao criar conta:', error);
             
-            // Se for erro de conexão, usar modo local
-            if (error.message.includes('fetch') || error.message.includes('network') || !error.code) {
-                console.warn('⚠️ Appwrite não disponível, usando modo local');
-                
-                // Criar conta local
-                const user = {
-                    name: name,
-                    email: email,
-                    loginDate: new Date().toISOString()
-                };
-                
-                state.user = user;
-                localStorage.setItem('voidnix-user', JSON.stringify(user));
-                updateUserUI();
-                
-                alert(`✅ Conta criada com sucesso! Bem-vindo, ${name}!`);
-                document.getElementById('registerFormElement').reset();
-                
-                setTimeout(() => {
-                    closeLoginModal();
-                }, 500);
-            } else if (error.code === 409) {
-                alert('❌ Já existe uma conta com este email.');
+            if (error.code === 409) {
+                alert('❌ Já existe uma conta registada com este email.\n\nPor favor, use outro email ou faça login.');
+            } else if (error.code === 400) {
+                alert('❌ Dados inválidos.\n\nPor favor, verifique o email e a palavra-passe.');
+            } else if (error.message.includes('fetch') || error.message.includes('network')) {
+                alert('❌ Erro de conexão com o servidor.\n\nPor favor, verifique a sua internet e tente novamente.');
             } else {
-                alert(`❌ Erro ao criar conta: ${error.message}`);
+                alert(`❌ Erro ao criar conta: ${error.message}\n\nPor favor, tente novamente ou contacte o suporte.`);
             }
         }
     } else {
-        // Fallback para modo local se Appwrite não estiver configurado
-        const user = {
-            name: name,
-            email: email,
-            loginDate: new Date().toISOString()
-        };
-        
-        state.user = user;
-        localStorage.setItem('voidnix-user', JSON.stringify(user));
-        updateUserUI();
-        
-        alert(`✅ Conta criada com sucesso! Bem-vindo, ${name}!`);
-        document.getElementById('registerFormElement').reset();
-        
-        setTimeout(() => {
-            closeLoginModal();
-        }, 500);
+        // Appwrite não configurado - não permitir registro
+        alert('❌ Sistema de registo indisponível.\n\nO servidor de autenticação não está acessível no momento.\nPor favor, tente novamente mais tarde ou contacte o suporte.');
+        console.error('❌ Appwrite não inicializado - registro bloqueado');
     }
 }
 
-function handleLogout() {
+async function handleLogout() {
     if (confirm('Tem certeza que deseja terminar a sessão?')) {
+        try {
+            // Fazer logout do Appwrite se estiver autenticado
+            if (account && state.user && !state.user.emergencyMode) {
+                await account.deleteSession('current');
+                console.log('✅ Logout do Appwrite realizado');
+            } else if (state.user && state.user.emergencyMode) {
+                console.log('⚠️ Logout do modo de emergência');
+            }
+        } catch (error) {
+            console.error('⚠️ Erro no logout (continuando):', error);
+            // Continuar com logout local mesmo se houver erro
+        }
+        
+        // Limpar estado local
         state.user = null;
         localStorage.removeItem('voidnix-user');
         updateUserUI();
         closeLoginModal();
+        
+        console.log('✅ Logout local concluído');
     }
 }
 
@@ -1455,23 +1493,82 @@ function updateUserUI() {
     }
 }
 
-function loadUserFromLocalStorage() {
+async function loadUserFromLocalStorage() {
     try {
         const savedUser = localStorage.getItem('voidnix-user');
         if (savedUser) {
-            state.user = JSON.parse(savedUser);
+            const user = JSON.parse(savedUser);
             
-            // Verificar se é admin apenas se for o email correto
-            if (state.user.email === 'danielcac19@gmail.com') {
-                state.user.isAdmin = true;
-                // Atualizar localStorage com a flag de admin
-                localStorage.setItem('voidnix-user', JSON.stringify(state.user));
+            // Se o Appwrite estiver disponível, validar a sessão
+            if (account) {
+                try {
+                    // Verificar se a sessão ainda é válida
+                    const session = await account.get();
+                    
+                    // Sessão válida - atualizar dados do usuário
+                    state.user = {
+                        $id: session.$id,
+                        name: session.name,
+                        email: session.email,
+                        loginDate: user.loginDate || new Date().toISOString(),
+                        isAdmin: session.email === 'danielcac19@gmail.com'
+                    };
+                    
+                    // Atualizar localStorage
+                    localStorage.setItem('voidnix-user', JSON.stringify(state.user));
+                    updateUserUI();
+                    
+                    console.log('✅ Sessão restaurada do Appwrite');
+                } catch (error) {
+                    // Sessão inválida ou expirada
+                    console.warn('⚠️ Sessão expirada ou inválida:', error);
+                    
+                    // Se for modo de emergência e as credenciais forem válidas, manter
+                    if (user.emergencyMode) {
+                        const emergencyAccounts = {
+                            'danielcac19@gmail.com': true,
+                            'admin@voidnix.pt': true
+                        };
+                        
+                        if (emergencyAccounts[user.email]) {
+                            state.user = user;
+                            updateUserUI();
+                            console.log('⚠️ Modo de emergência mantido');
+                        } else {
+                            // Limpar sessão inválida
+                            localStorage.removeItem('voidnix-user');
+                            state.user = null;
+                            console.log('🗑️ Sessão de emergência inválida removida');
+                        }
+                    } else {
+                        // Limpar sessão expirada
+                        localStorage.removeItem('voidnix-user');
+                        state.user = null;
+                        console.log('🗑️ Sessão expirada removida');
+                    }
+                }
+            } else {
+                // Appwrite não disponível - só aceitar modo de emergência com contas autorizadas
+                const emergencyAccounts = {
+                    'danielcac19@gmail.com': true,
+                    'admin@voidnix.pt': true
+                };
+                
+                if (user.emergencyMode && emergencyAccounts[user.email]) {
+                    state.user = user;
+                    updateUserUI();
+                    console.log('⚠️ Modo de emergência (Appwrite offline)');
+                } else {
+                    // Limpar usuário não autorizado
+                    localStorage.removeItem('voidnix-user');
+                    state.user = null;
+                    console.log('🗑️ Usuário local não autorizado removido');
+                }
             }
-            
-            updateUserUI();
         }
     } catch (e) {
-        console.error('Erro ao carregar utilizador:', e);
+        console.error('❌ Erro ao carregar utilizador:', e);
+        localStorage.removeItem('voidnix-user');
         state.user = null;
     }
 }
@@ -1636,26 +1733,6 @@ async function handleFacebookLogin() {
 }
 
 // ===== MONITORAR ESTADO DE AUTENTICAÇÃO =====
-// ===== LOGOUT COM APPWRITE =====
-async function handleLogout() {
-    if (confirm('Tem certeza que deseja terminar a sessão?')) {
-        try {
-            // Fazer logout do Appwrite
-            if (account) {
-                await account.deleteSession('current');
-                console.log('✅ Logout do Appwrite realizado');
-            }
-        } catch (error) {
-            console.error('Erro no logout:', error);
-        }
-        
-        // Limpar estado local
-        state.user = null;
-        localStorage.removeItem('voidnix-user');
-        updateUserUI();
-        closeLoginModal();
-    }
-}
 
 // ===== VERIFICAR SESSÃO DO APPWRITE =====
 async function checkAppwriteSession() {
