@@ -11,6 +11,7 @@ const appwriteConfig = {
     databaseId: '69242142000e84dc2029',
     productsCollectionId: 'products',
     invoicesCollectionId: 'invoices', // Coleção de faturas
+    usersCollectionId: 'users', // Coleção de dados dos utilizadores
     storageId: '6924221900051862cf89', // ID do bucket onde estão as imagens
     stripeCheckoutFunctionId: '6924ca1b00066a436744' // ID da função de checkout
 };

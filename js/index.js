@@ -1242,6 +1242,11 @@ async function handleLogin(e) {
         // Obter dados do usuário autenticado
         const userData = await account.get();
         
+        // Atualizar lastLogin na base de dados
+        await updateUserInDatabase(userData.$id, {
+            lastLogin: new Date().toISOString()
+        });
+        
         // Verificar se é admin
         const isAdmin = (userData.email === 'danielcac19@gmail.com');
         
@@ -1287,6 +1292,105 @@ async function handleLogin(e) {
         } else {
             alert(`❌ Erro ao fazer login.\n\nPor favor, tente novamente ou contacte o suporte.\n\nDetalhes: ${error.message || 'Erro desconhecido'}`);
         }
+    }
+}
+
+// ===== GUARDAR DADOS DO UTILIZADOR NA COLEÇÃO =====
+async function saveUserToDatabase(userId, userData) {
+    if (!databases || !appwriteConfig.usersCollectionId) {
+        console.log('⚠️ Coleção de utilizadores não disponível (será criada no Appwrite Dashboard)');
+        return null;
+    }
+    
+    try {
+        console.log('💾 Guardando dados do utilizador na coleção...');
+        
+        const userDocument = await databases.createDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.usersCollectionId,
+            userId, // Usar o mesmo ID do Appwrite Account
+            {
+                name: userData.name,
+                email: userData.email,
+                phone: userData.phone || '',
+                address: userData.address || '',
+                city: userData.city || '',
+                postalCode: userData.postalCode || '',
+                country: userData.country || 'Portugal',
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString(),
+                totalOrders: 0,
+                totalSpent: 0.0,
+                preferences: userData.preferences || {}
+            }
+        );
+        
+        console.log('✅ Dados do utilizador guardados com sucesso!');
+        return userDocument;
+        
+    } catch (error) {
+        if (error.code === 404) {
+            console.warn('⚠️ Coleção "users" não existe ainda no Appwrite.');
+            console.warn('📝 INSTRUÇÕES: Vá ao Appwrite Dashboard e crie a coleção "users" com os seguintes atributos:');
+            console.warn('   - name (string, 255), email (string, 255), phone (string, 20)');
+            console.warn('   - address (string, 500), city (string, 100), postalCode (string, 20)');
+            console.warn('   - country (string, 100), createdAt (datetime), lastLogin (datetime)');
+            console.warn('   - totalOrders (integer), totalSpent (float), preferences (string, 1000)');
+        } else {
+            console.error('❌ Erro ao guardar dados do utilizador:', error);
+        }
+        return null;
+    }
+}
+
+// ===== ATUALIZAR DADOS DO UTILIZADOR =====
+async function updateUserInDatabase(userId, updateData) {
+    if (!databases || !appwriteConfig.usersCollectionId) {
+        return null;
+    }
+    
+    try {
+        const userDocument = await databases.updateDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.usersCollectionId,
+            userId,
+            {
+                ...updateData,
+                lastLogin: new Date().toISOString()
+            }
+        );
+        
+        console.log('✅ Dados do utilizador atualizados!');
+        return userDocument;
+        
+    } catch (error) {
+        console.error('❌ Erro ao atualizar utilizador:', error);
+        return null;
+    }
+}
+
+// ===== OBTER DADOS DO UTILIZADOR DA COLEÇÃO =====
+async function getUserFromDatabase(userId) {
+    if (!databases || !appwriteConfig.usersCollectionId) {
+        return null;
+    }
+    
+    try {
+        const userDocument = await databases.getDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.usersCollectionId,
+            userId
+        );
+        
+        return userDocument;
+        
+    } catch (error) {
+        if (error.code === 404) {
+            console.log('ℹ️ Utilizador não encontrado na base de dados');
+        } else {
+            console.error('❌ Erro ao obter dados do utilizador:', error);
+        }
+        return null;
     }
 }
 
@@ -1353,6 +1457,17 @@ async function handleRegister(e) {
             
             // Obter dados do usuário
             const userData = await account.get();
+            
+            // Guardar dados do utilizador na coleção (base de dados)
+            await saveUserToDatabase(userData.$id, {
+                name: userData.name,
+                email: userData.email,
+                phone: '',
+                address: '',
+                city: '',
+                postalCode: '',
+                country: 'Portugal'
+            });
             
             state.user = {
                 $id: userData.$id,
