@@ -1737,9 +1737,27 @@ function setupLoginListeners() {
         });
     }
     
+    // Botão de criar conta (novo botão grande)
+    const showRegisterBtn = document.getElementById('showRegisterBtn');
+    if (showRegisterBtn) {
+        showRegisterBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showRegisterForm();
+        });
+    }
+    
     const showLogin = document.getElementById('showLogin');
     if (showLogin) {
         showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLoginForm();
+        });
+    }
+    
+    // Botão de entrar (novo botão grande no registro)
+    const showLoginBtn = document.getElementById('showLoginBtn');
+    if (showLoginBtn) {
+        showLoginBtn.addEventListener('click', (e) => {
             e.preventDefault();
             showLoginForm();
         });
