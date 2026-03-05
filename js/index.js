@@ -995,6 +995,96 @@ function setupEventListeners() {
     elements.checkoutBtn.addEventListener('click', handleCheckout);
 }
 
+// ===== REDUZIR STOCK APÓS COMPRA =====
+async function reduceProductStock(productId, quantity) {
+    if (!databases || !appwriteConfig.productsCollectionId) {
+        console.warn('⚠️ Não é possível atualizar stock - Appwrite não disponível');
+        return false;
+    }
+    
+    try {
+        console.log(`📦 Reduzindo stock do produto ${productId} em ${quantity} unidades...`);
+        
+        // Obter produto atual
+        const product = await databases.getDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.productsCollectionId,
+            productId
+        );
+        
+        const currentStock = parseInt(product.stockQuantity) || 0;
+        const newStock = Math.max(0, currentStock - quantity);
+        
+        console.log(`📊 Stock atual: ${currentStock} → Novo stock: ${newStock}`);
+        
+        // Atualizar stock
+        await databases.updateDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.productsCollectionId,
+            productId,
+            {
+                stockQuantity: newStock
+            }
+        );
+        
+        console.log(`✅ Stock atualizado com sucesso!`);
+        
+        // Atualizar produto local
+        const localProduct = sampleProducts.find(p => p.id === productId);
+        if (localProduct) {
+            localProduct.stock = newStock;
+        }
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Erro ao reduzir stock:', error);
+        return false;
+    }
+}
+
+// ===== VERIFICAR SE HÁ STOCK DISPONÍVEL =====
+async function checkStockAvailability(cartItems) {
+    const unavailableItems = [];
+    
+    for (const [key, quantity] of Object.entries(cartItems)) {
+        const [productId, size] = key.split('-');
+        const product = sampleProducts.find(p => p.id === productId);
+        
+        if (product) {
+            if (product.stock < quantity) {
+                unavailableItems.push({
+                    name: product.title,
+                    size: size,
+                    requested: quantity,
+                    available: product.stock
+                });
+            }
+        }
+    }
+    
+    return unavailableItems;
+}
+
+// ===== PROCESSAR REDUÇÃO DE STOCK DO CARRINHO =====
+async function processCartStockReduction() {
+    const results = [];
+    
+    for (const [key, quantity] of Object.entries(state.cart)) {
+        const [productId, size] = key.split('-');
+        
+        const success = await reduceProductStock(productId, quantity);
+        results.push({
+            productId,
+            size,
+            quantity,
+            success
+        });
+    }
+    
+    return results;
+}
+
 // ===== CHECKOUT COM APPWRITE FUNCTION =====
 async function handleCheckout() {
     // Verificar se o usuário está logado
@@ -1013,6 +1103,20 @@ async function handleCheckout() {
     // Verificar se o carrinho tem produtos
     if (Object.keys(state.cart).length === 0) {
         alert('Seu carrinho está vazio!');
+        return;
+    }
+    
+    // ✅ VERIFICAR STOCK ANTES DE PROSSEGUIR
+    const unavailableItems = await checkStockAvailability(state.cart);
+    
+    if (unavailableItems.length > 0) {
+        let message = '❌ Alguns produtos não têm stock suficiente:\n\n';
+        unavailableItems.forEach(item => {
+            message += `• ${item.name} (Tamanho ${item.size})\n`;
+            message += `  Pedido: ${item.requested} | Disponível: ${item.available}\n\n`;
+        });
+        message += 'Por favor, ajuste as quantidades no carrinho.';
+        alert(message);
         return;
     }
     
@@ -1112,8 +1216,22 @@ async function handleCheckout() {
         if (checkoutUrl) {
             console.log('✅ Redirecionando para Stripe Checkout...');
             
+            // 💾 Reduzir stock dos produtos antes de redirecionar
+            console.log('📦 Reduzindo stock dos produtos...');
+            const stockResults = await processCartStockReduction();
+            
+            const failedUpdates = stockResults.filter(r => !r.success);
+            if (failedUpdates.length > 0) {
+                console.warn('⚠️ Alguns produtos não tiveram stock atualizado:', failedUpdates);
+            } else {
+                console.log('✅ Stock de todos os produtos atualizado!');
+            }
+            
             // Salvar encomenda antes de redirecionar
             await saveOrder(lineItems, calculateTotal());
+            
+            // Recarregar produtos para atualizar stock na UI
+            await loadProductsFromAppwrite();
             
             // Redirecionar para o Stripe Checkout
             window.location.href = checkoutUrl;
