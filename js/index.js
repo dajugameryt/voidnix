@@ -1224,130 +1224,68 @@ async function handleLogin(e) {
         return;
     }
     
-    // Lista de contas de emergência (APENAS para quando Appwrite estiver offline)
-    const emergencyAccounts = {
-        'danielcac19@gmail.com': '6971david',
-        'admin@voidnix.pt': 'admin123'
-    };
+    // Verificar se Appwrite está disponível
+    if (!account) {
+        alert('❌ Sistema de autenticação offline.\n\nPor favor, tente novamente mais tarde.');
+        console.error('❌ Appwrite não inicializado');
+        return;
+    }
     
-    // Verificar se é admin
-    const isAdmin = (email === 'danielcac19@gmail.com');
-    
-    // Login com Appwrite (método principal)
-    if (account) {
-        try {
-            console.log('🔐 Fazendo login no Appwrite...');
-            
-            // Criar sessão de email
-            await account.createEmailSession(email, password);
-            
-            console.log('✅ Login realizado com sucesso');
-            
-            // Obter dados do usuário
-            const userData = await account.get();
-            
-            state.user = {
-                $id: userData.$id,
-                name: userData.name,
-                email: userData.email,
-                loginDate: new Date().toISOString(),
-                isAdmin: isAdmin || email === 'danielcac19@gmail.com'
-            };
-            
-            // Salvar no localStorage se "Lembrar-me" estiver marcado
-            if (rememberMe) {
-                localStorage.setItem('voidnix-user', JSON.stringify(state.user));
-            }
-            
-            updateUserUI();
-            showUserProfile();
-            
-            // Limpar formulário
-            document.getElementById('loginFormElement').reset();
-            
-            // Fechar modal
-            setTimeout(() => {
-                closeLoginModal();
-                if (isAdmin) {
-                    console.log('👑 Admin autenticado');
-                }
-            }, 500);
-            
-        } catch (error) {
-            console.error('❌ Erro ao fazer login no Appwrite:', error);
-            
-            // Se for erro de rede/conexão E a conta estiver na lista de emergência
-            if ((error.message.includes('fetch') || error.message.includes('network') || !error.code)) {
-                console.warn('⚠️ Appwrite indisponível, verificando credenciais de emergência...');
-                
-                // Validar credenciais de emergência
-                if (emergencyAccounts[email] && emergencyAccounts[email] === password) {
-                    console.log('✅ Login de emergência bem-sucedido');
-                    
-                    const user = {
-                        name: email.split('@')[0],
-                        email: email,
-                        loginDate: new Date().toISOString(),
-                        isAdmin: isAdmin,
-                        emergencyMode: true
-                    };
-                    
-                    state.user = user;
-                    
-                    if (rememberMe) {
-                        localStorage.setItem('voidnix-user', JSON.stringify(user));
-                    }
-                    
-                    updateUserUI();
-                    showUserProfile();
-                    document.getElementById('loginFormElement').reset();
-                    
-                    alert('⚠️ Login de emergência ativado. Algumas funcionalidades podem estar limitadas.');
-                    
-                    setTimeout(() => {
-                        closeLoginModal();
-                    }, 500);
-                } else {
-                    alert('❌ Appwrite está offline e as suas credenciais não estão autorizadas para login de emergência.\n\nPor favor, tente novamente mais tarde ou contacte o suporte.');
-                }
-            } else if (error.code === 401) {
-                alert('❌ Email ou palavra-passe incorretos.\n\nPor favor, verifique os seus dados e tente novamente.');
-            } else {
-                alert(`❌ Erro ao fazer login: ${error.message}`);
-            }
-        }
-    } else {
-        // Appwrite não inicializado - exigir credenciais de emergência
-        console.warn('⚠️ Appwrite não configurado');
+    try {
+        console.log('🔐 Autenticando no Appwrite...');
         
-        if (emergencyAccounts[email] && emergencyAccounts[email] === password) {
-            console.log('✅ Login de emergência (Appwrite não configurado)');
-            
-            const user = {
-                name: email.split('@')[0],
-                email: email,
-                loginDate: new Date().toISOString(),
-                isAdmin: isAdmin,
-                emergencyMode: true
-            };
-            
-            state.user = user;
-            
-            if (rememberMe) {
-                localStorage.setItem('voidnix-user', JSON.stringify(user));
+        // APENAS login via Appwrite - SEM FALLBACKS
+        await account.createEmailSession(email, password);
+        
+        console.log('✅ Login bem-sucedido');
+        
+        // Obter dados do usuário autenticado
+        const userData = await account.get();
+        
+        // Verificar se é admin
+        const isAdmin = (userData.email === 'danielcac19@gmail.com');
+        
+        state.user = {
+            $id: userData.$id,
+            name: userData.name,
+            email: userData.email,
+            loginDate: new Date().toISOString(),
+            isAdmin: isAdmin
+        };
+        
+        // Salvar no localStorage se "Lembrar-me" estiver marcado
+        if (rememberMe) {
+            localStorage.setItem('voidnix-user', JSON.stringify(state.user));
+        }
+        
+        updateUserUI();
+        showUserProfile();
+        
+        // Limpar formulário
+        document.getElementById('loginFormElement').reset();
+        
+        // Fechar modal
+        setTimeout(() => {
+            closeLoginModal();
+            if (isAdmin) {
+                console.log('👑 Admin autenticado');
             }
-            
-            updateUserUI();
-            showUserProfile();
-            document.getElementById('loginFormElement').reset();
-            
-            alert('⚠️ Sistema em modo de emergência. Funcionalidade limitada.');
-            
-            setTimeout(() => {
-                closeLoginModal();
-            }, 500);
+        }, 500);
+        
+    } catch (error) {
+        console.error('❌ Erro ao fazer login:', error);
+        
+        // Mensagens de erro específicas
+        if (error.code === 401) {
+            alert('❌ Email ou palavra-passe incorretos.\n\nVerifique os seus dados e tente novamente.');
+        } else if (error.code === 429) {
+            alert('❌ Muitas tentativas de login.\n\nPor favor, aguarde alguns minutos e tente novamente.');
+        } else if (error.message && error.message.includes('fetch')) {
+            alert('❌ Erro de conexão com o servidor.\n\nVerifique a sua internet e tente novamente.');
+        } else if (error.message && error.message.includes('network')) {
+            alert('❌ Problemas de rede.\n\nVerifique a sua conexão e tente novamente.');
         } else {
-            alert('❌ Credenciais inválidas.\n\nO sistema de autenticação não está disponível. Contacte o administrador.');
+            alert(`❌ Erro ao fazer login.\n\nPor favor, tente novamente ou contacte o suporte.\n\nDetalhes: ${error.message || 'Erro desconhecido'}`);
         }
     }
 }
@@ -1460,25 +1398,23 @@ async function handleRegister(e) {
 async function handleLogout() {
     if (confirm('Tem certeza que deseja terminar a sessão?')) {
         try {
-            // Fazer logout do Appwrite se estiver autenticado
-            if (account && state.user && !state.user.emergencyMode) {
+            // Fazer logout do Appwrite
+            if (account && state.user) {
                 await account.deleteSession('current');
                 console.log('✅ Logout do Appwrite realizado');
-            } else if (state.user && state.user.emergencyMode) {
-                console.log('⚠️ Logout do modo de emergência');
             }
         } catch (error) {
-            console.error('⚠️ Erro no logout (continuando):', error);
-            // Continuar com logout local mesmo se houver erro
+            console.error('⚠️ Erro no logout do servidor:', error);
+            // Continuar com logout local mesmo se houver erro no servidor
         }
         
-        // Limpar estado local
+        // Limpar estado local SEMPRE
         state.user = null;
         localStorage.removeItem('voidnix-user');
         updateUserUI();
         closeLoginModal();
         
-        console.log('✅ Logout local concluído');
+        console.log('✅ Logout concluído');
     }
 }
 
@@ -1499,7 +1435,7 @@ async function loadUserFromLocalStorage() {
         if (savedUser) {
             const user = JSON.parse(savedUser);
             
-            // Se o Appwrite estiver disponível, validar a sessão
+            // SEMPRE validar sessão com Appwrite - sem fallbacks
             if (account) {
                 try {
                     // Verificar se a sessão ainda é válida
@@ -1518,52 +1454,19 @@ async function loadUserFromLocalStorage() {
                     localStorage.setItem('voidnix-user', JSON.stringify(state.user));
                     updateUserUI();
                     
-                    console.log('✅ Sessão restaurada do Appwrite');
+                    console.log('✅ Sessão restaurada e validada');
                 } catch (error) {
-                    // Sessão inválida ou expirada
-                    console.warn('⚠️ Sessão expirada ou inválida:', error);
-                    
-                    // Se for modo de emergência e as credenciais forem válidas, manter
-                    if (user.emergencyMode) {
-                        const emergencyAccounts = {
-                            'danielcac19@gmail.com': true,
-                            'admin@voidnix.pt': true
-                        };
-                        
-                        if (emergencyAccounts[user.email]) {
-                            state.user = user;
-                            updateUserUI();
-                            console.log('⚠️ Modo de emergência mantido');
-                        } else {
-                            // Limpar sessão inválida
-                            localStorage.removeItem('voidnix-user');
-                            state.user = null;
-                            console.log('🗑️ Sessão de emergência inválida removida');
-                        }
-                    } else {
-                        // Limpar sessão expirada
-                        localStorage.removeItem('voidnix-user');
-                        state.user = null;
-                        console.log('🗑️ Sessão expirada removida');
-                    }
-                }
-            } else {
-                // Appwrite não disponível - só aceitar modo de emergência com contas autorizadas
-                const emergencyAccounts = {
-                    'danielcac19@gmail.com': true,
-                    'admin@voidnix.pt': true
-                };
-                
-                if (user.emergencyMode && emergencyAccounts[user.email]) {
-                    state.user = user;
-                    updateUserUI();
-                    console.log('⚠️ Modo de emergência (Appwrite offline)');
-                } else {
-                    // Limpar usuário não autorizado
+                    // Sessão inválida ou expirada - LIMPAR SEMPRE
+                    console.warn('⚠️ Sessão expirada ou inválida, removendo...', error);
                     localStorage.removeItem('voidnix-user');
                     state.user = null;
-                    console.log('🗑️ Usuário local não autorizado removido');
+                    console.log('🗑️ Sessão local removida');
                 }
+            } else {
+                // Appwrite não disponível - remover sessão local não validada
+                console.warn('⚠️ Appwrite offline - removendo sessão não validada');
+                localStorage.removeItem('voidnix-user');
+                state.user = null;
             }
         }
     } catch (e) {
@@ -1650,6 +1553,9 @@ function setupLoginListeners() {
 
 // ===== LOGIN COM GOOGLE (APPWRITE) =====
 async function handleGoogleLogin() {
+    alert('⚠️ Login com Google temporariamente desativado.\n\nPor favor, crie uma conta com email e palavra-passe.');
+    return;
+    
     // Verificar se Appwrite está configurado
     if (!account) {
         alert('⚠️ Appwrite não está configurado.');
@@ -1679,6 +1585,9 @@ async function handleGoogleLogin() {
 
 // ===== LOGIN COM FACEBOOK =====
 async function handleFacebookLogin() {
+    alert('⚠️ Login com Facebook temporariamente desativado.\n\nPor favor, crie uma conta com email e palavra-passe.');
+    return;
+    
     // Verificar se Firebase está configurado
     if (!auth || !facebookProvider) {
         alert('⚠️ Firebase não está configurado.\n\nPara usar login com Facebook:\n1. Acesse https://console.firebase.google.com/\n2. Crie um projeto\n3. Ative "Authentication" > "Facebook"\n4. Configure as credenciais em firebase-config.js');
