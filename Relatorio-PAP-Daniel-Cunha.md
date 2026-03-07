@@ -81,9 +81,11 @@ A todos, o meu sincero obrigado.
 
 ### **4.1. Motivação**
 
-A escolha deste tema surgiu do interesse pela área do comércio eletrónico e pelo desafio de criar uma solução completa e funcional que integrasse diversas tecnologias modernas. O mercado do e-commerce tem crescido exponencialmente, especialmente no setor do vestuário, tornando-se essencial compreender os mecanismos e tecnologias envolvidas no desenvolvimento de plataformas deste tipo.
+A origem deste projeto está numa situação do quotidiano: um amigo próximo tinha o sonho de vender roupa online, mas não sabia como transformar essa ideia numa realidade. Ao tomar conhecimento da situação, decidi colocar-me à frente e assumir o desafio de desenvolver uma plataforma de e-commerce completa que pudesse dar vida a esse projeto.
 
-A motivação específica para criar a **VoidNix** relaciona-se com a oportunidade de aplicar conhecimentos adquiridos ao longo do curso numa solução real, que pudesse ser eventualmente utilizada comercialmente. O setor do streetwear apresenta características específicas que tornam este projeto particularmente interessante: público-alvo jovem, forte componente visual e necessidade de uma experiência de utilizador moderna e apelativa.
+Esta motivação pessoal aliou-se ao contexto académico da PAP, tornando-se a oportunidade ideal para aplicar, de forma prática e real, os conhecimentos adquiridos ao longo do curso. Em vez de criar um projeto meramente demonstrativo, estava a construir algo com propósito concreto: uma ferramenta que um amigo poderia efetivamente utilizar para iniciar o seu negócio.
+
+O setor do streetwear apresenta características específicas que tornaram este projeto particularmente interessante: público-alvo jovem, forte componente visual e necessidade de uma experiência de utilizador moderna e apelativa. O desafio de integrar múltiplas tecnologias — autenticação, pagamentos, faturas, SEO e conformidade legal — num sistema coeso e funcional foi o motor que impulsionou todo o desenvolvimento.
 
 ### **4.2. Objetivos**
 
