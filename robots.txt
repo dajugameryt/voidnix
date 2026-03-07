@@ -1,0 +1,40 @@
+# Robots.txt para VoidNix
+# https://voidnix.pt
+
+# Todos os robots - permitir tudo exceto áreas privadas
+User-agent: *
+Allow: /
+Allow: /css/
+Allow: /js/
+Allow: /imagem/
+Disallow: /api/
+Disallow: /admin.html
+Disallow: /testar-appwrite.html
+Disallow: /teste-registro.html
+Disallow: /.vercel/
+Disallow: /node_modules/
+Disallow: /backend/
+Disallow: /appwrite-function/
+
+# Sitemap
+Sitemap: https://voidnix.pt/sitemap.xml
+
+# Google
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /admin.html
+Disallow: /testar-appwrite.html
+Disallow: /teste-registro.html
+Crawl-delay: 1
+
+# Google Images
+User-agent: Googlebot-Image
+Allow: /imagem/
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Disallow: /admin.html
+Crawl-delay: 2

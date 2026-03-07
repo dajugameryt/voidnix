@@ -12,6 +12,14 @@ module.exports = async (req, res) => {
   }
 
   try {
+    // Verificar se a chave do Stripe está configurada
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('❌ STRIPE_SECRET_KEY não configurada!');
+      return res.status(500).json({ 
+        error: 'Configuração do Stripe ausente. Por favor, configure STRIPE_SECRET_KEY nas variáveis de ambiente da Vercel.' 
+      });
+    }
+
     const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
     const { lineItems, customerEmail } = req.body;
 
@@ -24,8 +32,8 @@ module.exports = async (req, res) => {
       line_items: lineItems,
       mode: 'payment',
       customer_email: customerEmail,
-      success_url: 'https://voidnix.vercel.app/index.html?payment=success',
-      cancel_url: 'https://voidnix.vercel.app/index.html?payment=cancel',
+      success_url: 'https://voidnix.pt?payment=success',
+      cancel_url: 'https://voidnix.pt?payment=cancel',
       billing_address_collection: 'required',
       shipping_address_collection: {
         allowed_countries: ['PT', 'ES', 'FR', 'DE', 'IT', 'GB', 'US'],

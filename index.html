@@ -1,13 +1,51 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-PT">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="imagem\IG_64x64.png">
-  <link rel="stylesheet" href="css/style.css?v=2.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   
-  <title>VoidNix — Loja</title>
-  <meta name="description" content="VoidNix — Street Style. Loja online de roupas urbanas e acessórios.">
+  <!-- SEO Meta Tags -->
+  <title>VoidNix — Loja de Roupa Street Style | Moda Urbana Portugal</title>
+  <meta name="description" content="Descobre a VoidNix, a tua loja online de roupa street style em Portugal. Moda urbana, streetwear, hoodies, t-shirts e acessórios únicos. Envios para toda a Europa. ✓ Qualidade Premium ✓ Estilo Único">
+  <meta name="keywords" content="voidnix, loja roupa online, street style portugal, streetwear, moda urbana, roupa urbana, hoodies, t-shirts, acessórios moda, loja online portugal, comprar roupa online">
+  <meta name="author" content="VoidNix">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow">
+  <link rel="canonical" href="https://voidnix.pt">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://voidnix.pt">
+  <meta property="og:site_name" content="VoidNix">
+  <meta property="og:title" content="VoidNix — Loja de Roupa Street Style | Moda Urbana Portugal">
+  <meta property="og:description" content="Descobre a VoidNix, a tua loja online de roupa street style em Portugal. Moda urbana, streetwear, hoodies, t-shirts e acessórios únicos. ✓ Qualidade Premium ✓ Estilo Único">
+  <meta property="og:image" content="https://voidnix.pt/imagem/IG.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="pt_PT">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://voidnix.pt">
+  <meta name="twitter:title" content="VoidNix — Loja de Roupa Street Style | Moda Urbana Portugal">
+  <meta name="twitter:description" content="Descobre a VoidNix, a tua loja online de roupa street style em Portugal. Moda urbana, streetwear, hoodies, t-shirts e acessórios únicos.">
+  <meta name="twitter:image" content="https://voidnix.pt/imagem/IG.png">
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="imagem/IG_64x64.png">
+  <link rel="apple-touch-icon" href="imagem/IG.png">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#764ba2">
+  <meta name="msapplication-TileColor" content="#764ba2">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css?v=2.1">
+  
+  <!-- Preconnect for Performance -->
+  <link rel="preconnect" href="https://cloud.appwrite.io">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
 
   <!-- Appwrite SDK -->
   <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1"></script>
@@ -15,6 +53,121 @@
   <!-- Firebase (para autenticação) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  
+  <!-- JSON-LD Structured Data: Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "VoidNix",
+    "url": "https://voidnix.pt",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://voidnix.pt/imagem/IG.png",
+      "width": 512,
+      "height": 512
+    },
+    "description": "Loja online de roupa street style e moda urbana em Portugal. Streetwear, hoodies, t-shirts e acessórios únicos.",
+    "foundingDate": "2024",
+    "areaServed": ["PT", "ES", "FR", "DE", "GB"],
+    "sameAs": [
+      "https://voidnix.pt"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "availableLanguage": ["Portuguese", "English"],
+      "areaServed": "PT"
+    }
+  }
+  </script>
+
+  <!-- JSON-LD Structured Data: WebSite + Sitelinks Search Box -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "VoidNix",
+    "url": "https://voidnix.pt",
+    "description": "Loja online de roupa street style e moda urbana em Portugal",
+    "inLanguage": "pt-PT",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://voidnix.pt?search={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- JSON-LD Structured Data: ClothingStore -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ClothingStore",
+    "name": "VoidNix",
+    "description": "Loja online de roupa street style e moda urbana em Portugal. Streetwear, hoodies, t-shirts e acessórios únicos com envio para toda a Europa.",
+    "url": "https://voidnix.pt",
+    "image": "https://voidnix.pt/imagem/IG.png",
+    "priceRange": "€€",
+    "currenciesAccepted": "EUR",
+    "paymentAccepted": "Cartão de Crédito, Cartão de Débito, Google Pay, Apple Pay",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "PT",
+      "addressRegion": "Portugal"
+    },
+    "areaServed": [
+      { "@type": "Country", "name": "Portugal" },
+      { "@type": "Country", "name": "Spain" },
+      { "@type": "Country", "name": "France" },
+      { "@type": "Country", "name": "Germany" },
+      { "@type": "Country", "name": "United Kingdom" }
+    ],
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Coleção VoidNix",
+      "itemListElement": [
+        {
+          "@type": "OfferCatalog",
+          "name": "Roupa de Mulher",
+          "description": "Streetwear e moda urbana feminina"
+        },
+        {
+          "@type": "OfferCatalog",
+          "name": "Roupa de Homem",
+          "description": "Streetwear e moda urbana masculina"
+        },
+        {
+          "@type": "OfferCatalog",
+          "name": "Acessórios",
+          "description": "Acessórios de moda urbana e street style"
+        }
+      ]
+    },
+    "sameAs": [
+      "https://voidnix.pt"
+    ]
+  }
+  </script>
+
+  <!-- JSON-LD Structured Data: BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "VoidNix — Loja de Roupa",
+        "item": "https://voidnix.pt"
+      }
+    ]
+  }
+  </script>
     
 </head>
 <body>
@@ -170,7 +323,7 @@
       
       <div class="social-login">
         <button class="btn-social btn-google">
-          <span class="social-icon">G</span>
+          <img src="imagem/images (8).jpg" alt="Google" class="social-icon" style="width: 20px; height: 20px; object-fit: contain;">
           Continuar com Google
         </button>
       </div>
@@ -214,7 +367,7 @@
         <div class="form-options">
           <label class="checkbox-label">
             <input type="checkbox" id="acceptTerms" required>
-            <span>Aceito os <a href="#" class="link-text">termos e condições</a></span>
+            <span>Aceito os <a href="termos.html" target="_blank" class="link-text">termos e condições</a> e a <a href="privacidade.html" target="_blank" class="link-text">política de privacidade</a></span>
           </label>
         </div>
         
@@ -227,7 +380,7 @@
       
       <div class="social-login">
         <button class="btn-social btn-google">
-          <span class="social-icon">G</span>
+          <img src="imagem/images (8).jpg" alt="Google" class="social-icon" style="width: 20px; height: 20px; object-fit: contain;">
           Continuar com Google
         </button>
       </div>
@@ -236,6 +389,29 @@
         <p style="margin-bottom: 16px;">Já tem conta?</p>
         <button type="button" class="btn btn-secondary btn-full" id="showLoginBtn">
           Entrar na Minha Conta
+        </button>
+      </div>
+    </div>
+
+    <!-- Verificação de Email Pendente -->
+    <div class="verification-pending" id="verificationPending" style="display: none;">
+      <div class="login-header">
+        <h2>📧 Confirme o seu Email</h2>
+        <p class="login-subtitle">Só falta um passo para ativar a conta!</p>
+      </div>
+      <div style="text-align: center; padding: 10px 0 20px;">
+        <div style="font-size: 3.5rem; margin-bottom: 16px;">📬</div>
+        <p style="margin-bottom: 10px; color: #ccc;">Enviámos um link de confirmação para:</p>
+        <p style="font-weight: 700; color: #fff; font-size: 1.05rem; margin-bottom: 20px; word-break: break-all;" id="pendingEmail">email@exemplo.com</p>
+        <p style="font-size: 0.85rem; color: #999; margin-bottom: 24px; line-height: 1.6;">
+          Clique no link do email para ativar a sua conta.<br>
+          Verifique também a pasta de <strong>spam</strong>.
+        </p>
+        <button class="btn btn-primary btn-full" id="resendVerificationBtn" style="margin-bottom: 12px;">
+          🔄 Reenviar Email de Verificação
+        </button>
+        <button class="btn btn-secondary btn-full" id="backToLoginFromVerify">
+          Já verifiquei — Fazer Login
         </button>
       </div>
     </div>
@@ -364,5 +540,79 @@
 <script src="js/firebase-config.js"></script>
 <script src="js/invoices.js"></script>
 <script src="js/index.js"></script>
+
+<!-- Footer Legal -->
+<footer style="background:#111;border-top:1px solid #222;padding:40px 20px 30px;margin-top:60px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div style="display:flex;flex-wrap:wrap;gap:40px;justify-content:space-between;margin-bottom:30px;">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <img src="imagem/IG.png" alt="VoidNix" style="width:32px;height:32px;border-radius:6px;">
+          <span style="color:#fff;font-weight:700;font-size:1.1rem;">VoidNix</span>
+        </div>
+        <p style="color:#666;font-size:0.85rem;max-width:240px;line-height:1.6;">Loja online de roupa street style e moda urbana em Portugal.</p>
+      </div>
+      <div>
+        <div style="color:#999;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Legal</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a href="termos.html" style="color:#888;font-size:0.88rem;text-decoration:none;" onmouseover="this.style.color='#9b7fe8'" onmouseout="this.style.color='#888'">Termos e Condições</a>
+          <a href="privacidade.html" style="color:#888;font-size:0.88rem;text-decoration:none;" onmouseover="this.style.color='#9b7fe8'" onmouseout="this.style.color='#888'">Política de Privacidade</a>
+          <a href="devolucoes.html" style="color:#888;font-size:0.88rem;text-decoration:none;" onmouseover="this.style.color='#9b7fe8'" onmouseout="this.style.color='#888'">Devoluções e Reembolsos</a>
+          <a href="sobre.html" style="color:#888;font-size:0.88rem;text-decoration:none;" onmouseover="this.style.color='#9b7fe8'" onmouseout="this.style.color='#888'">Sobre Nós</a>
+        </div>
+      </div>
+      <div>
+        <div style="color:#999;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Consumidor</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a href="https://www.livroreclamacoes.pt" target="_blank" rel="noopener" style="color:#888;font-size:0.88rem;text-decoration:none;" onmouseover="this.style.color='#9b7fe8'" onmouseout="this.style.color='#888'">📋 Livro de Reclamações</a>
+          <a href="https://www.cniacc.pt" target="_blank" rel="noopener" style="color:#888;font-size:0.88rem;text-decoration:none;" onmouseover="this.style.color='#9b7fe8'" onmouseout="this.style.color='#888'">⚖️ CNIACC (Arbitragem)</a>
+          <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener" style="color:#888;font-size:0.88rem;text-decoration:none;" onmouseover="this.style.color='#9b7fe8'" onmouseout="this.style.color='#888'">🇪🇺 Plataforma ODR (UE)</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid #222;padding-top:20px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;">
+      <p style="color:#555;font-size:0.8rem;">© 2024–2026 VoidNix. Todos os direitos reservados. IVA incluído nos preços.</p>
+      <p style="color:#555;font-size:0.8rem;">Desenvolvido em Portugal 🇵🇹</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Banner de Consentimento de Cookies -->
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1a1a2e;border-top:2px solid #764ba2;padding:18px 24px;box-shadow:0 -4px 20px rgba(0,0,0,0.5);">
+  <div style="max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;">
+    <div style="flex:1;min-width:260px;">
+      <p style="color:#e0e0e0;font-size:0.88rem;line-height:1.6;margin:0;">
+        🍪 Utilizamos cookies necessários para o funcionamento da loja (sessão, carrinho). Ao continuar, aceita a utilização destes cookies nos termos da nossa <a href="privacidade.html" style="color:#9b7fe8;">Política de Privacidade</a>.
+      </p>
+    </div>
+    <div style="display:flex;gap:10px;flex-shrink:0;">
+      <button onclick="acceptCookies()" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-size:0.88rem;font-weight:600;cursor:pointer;">Aceitar</button>
+      <button onclick="rejectCookies()" style="background:transparent;color:#888;border:1px solid #444;padding:10px 16px;border-radius:8px;font-size:0.88rem;cursor:pointer;">Recusar não essenciais</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var consent = localStorage.getItem('voidnix-cookie-consent');
+  if (!consent) {
+    var banner = document.getElementById('cookieBanner');
+    if (banner) banner.style.display = 'block';
+  }
+})();
+
+function acceptCookies() {
+  localStorage.setItem('voidnix-cookie-consent', 'accepted');
+  var banner = document.getElementById('cookieBanner');
+  if (banner) banner.style.display = 'none';
+}
+
+function rejectCookies() {
+  localStorage.setItem('voidnix-cookie-consent', 'essential-only');
+  var banner = document.getElementById('cookieBanner');
+  if (banner) banner.style.display = 'none';
+}
+</script>
+
 </body>
 </html>

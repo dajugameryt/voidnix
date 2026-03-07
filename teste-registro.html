@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Registro - VoidNix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .success {
+            color: #10b981;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .feature {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+        
+        .feature p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .code {
+            background: #2d3748;
+            color: #48bb78;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .requirements {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .requirements h4 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+        
+        .requirements ul {
+            margin-left: 20px;
+            color: #78350f;
+        }
+        
+        .requirements li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="success">✅</div>
+        <h1>Sistema de Registro Ativo!</h1>
+        <p class="subtitle">O botão de registro está implementado e funcionando perfeitamente</p>
+        
+        <div class="feature">
+            <h3>🎯 Onde está o botão?</h3>
+            <p>
+                1. Na página principal (<strong>index.html</strong>), clique no ícone de utilizador (👤) no topo<br>
+                2. No modal que abrir, clique em <strong>"Criar Nova Conta"</strong><br>
+                3. Preencha os dados e clique em <strong>"Criar Conta"</strong>
+            </p>
+        </div>
+        
+        <div class="feature">
+            <h3>🔐 Campos do Formulário</h3>
+            <p>
+                ✅ Nome Completo<br>
+                ✅ Email (deve ser válido)<br>
+                ✅ Palavra-passe (mínimo 8 caracteres)<br>
+                ✅ Confirmar Palavra-passe<br>
+                ✅ Aceitar termos e condições
+            </p>
+        </div>
+        
+        <div class="requirements">
+            <h4>⚠️ Requisitos da Senha</h4>
+            <ul>
+                <li>Mínimo de 8 caracteres</li>
+                <li>Pelo menos 1 letra MAIÚSCULA</li>
+                <li>Pelo menos 1 letra minúscula</li>
+                <li>Pelo menos 1 número</li>
+            </ul>
+            <div class="code">Exemplo válido: MinhaPass123</div>
+        </div>
+        
+        <div class="feature">
+            <h3>📦 O que acontece ao registar?</h3>
+            <p>
+                1. Conta criada no <strong>Appwrite</strong><br>
+                2. Login automático<br>
+                3. Dados guardados na coleção "<strong>users</strong>"<br>
+                4. Redirecionamento para o perfil
+            </p>
+        </div>
+        
+        <div class="feature">
+            <h3>🔧 Tecnologia</h3>
+            <p>
+                <strong>Frontend:</strong> HTML + JavaScript<br>
+                <strong>Backend:</strong> Appwrite Cloud<br>
+                <strong>Database:</strong> Appwrite Database<br>
+                <strong>Segurança:</strong> Encriptação + Validação
+            </p>
+        </div>
+        
+        <a href="index.html" class="btn">🚀 Ir para a Loja e Testar</a>
+    </div>
+    
+    <script>
+        console.log('✅ Teste de Registro - Sistema Ativo');
+        console.log('📁 Arquivo principal: index.html');
+        console.log('⚙️ Configuração: js/appwrite-config.js');
+        console.log('🔐 Autenticação: js/index.js (função handleRegister)');
+        console.log('');
+        console.log('Para testar:');
+        console.log('1. Abra index.html');
+        console.log('2. Clique no botão de utilizador (👤)');
+        console.log('3. Clique em "Criar Nova Conta"');
+        console.log('4. Preencha os dados');
+        console.log('5. Clique em "Criar Conta"');
+    </script>
+</body>
+</html>

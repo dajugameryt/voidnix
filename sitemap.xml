@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Página Principal -->
+  <url>
+    <loc>https://voidnix.pt</loc>
+    <lastmod>2026-03-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://voidnix.pt/imagem/IG.png</image:loc>
+      <image:title>VoidNix — Loja de Roupa Street Style Portugal</image:title>
+    </image:image>
+  </url>
+
+  <!-- Redirecionamento www -->
+  <url>
+    <loc>https://www.voidnix.pt</loc>
+    <lastmod>2026-03-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Página Sobre Nós -->
+  <url>
+    <loc>https://voidnix.pt/sobre.html</loc>
+    <lastmod>2026-03-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Termos e Condições -->
+  <url>
+    <loc>https://voidnix.pt/termos.html</loc>
+    <lastmod>2026-03-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- Política de Privacidade -->
+  <url>
+    <loc>https://voidnix.pt/privacidade.html</loc>
+    <lastmod>2026-03-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- Política de Devoluções -->
+  <url>
+    <loc>https://voidnix.pt/devolucoes.html</loc>
+    <lastmod>2026-03-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

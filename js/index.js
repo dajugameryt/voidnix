@@ -1287,18 +1287,78 @@ function showLoginForm() {
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('registerForm').style.display = 'none';
     document.getElementById('userProfile').style.display = 'none';
+    const vp = document.getElementById('verificationPending');
+    if (vp) vp.style.display = 'none';
 }
 
 function showRegisterForm() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('registerForm').style.display = 'block';
     document.getElementById('userProfile').style.display = 'none';
+    const vp = document.getElementById('verificationPending');
+    if (vp) vp.style.display = 'none';
+}
+
+function showVerificationPending(email) {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('userProfile').style.display = 'none';
+    const vp = document.getElementById('verificationPending');
+    if (vp) {
+        vp.style.display = 'block';
+        vp.dataset.email = email || '';
+    }
+    const pendingEmailEl = document.getElementById('pendingEmail');
+    if (pendingEmailEl) pendingEmailEl.textContent = email || '';
+    openLoginModal();
+}
+
+async function resendVerificationEmail() {
+    const btn = document.getElementById('resendVerificationBtn');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ A enviar...'; }
+    try {
+        const verificationUrl = window.location.origin + window.location.pathname;
+        await account.createVerification(verificationUrl);
+        alert('✅ Email de verificação reenviado!\n\nVerifique a sua caixa de entrada (e a pasta spam).');
+    } catch (error) {
+        console.error('❌ Erro ao reenviar verificação:', error);
+        alert('❌ Erro ao reenviar o email.\n\nPor favor, tente fazer login novamente para receber um novo link.');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 Reenviar Email de Verificação'; }
+    }
+}
+
+async function checkEmailVerification() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('userId');
+    const secret = urlParams.get('secret');
+
+    if (userId && secret) {
+        try {
+            await account.updateVerification(userId, secret);
+            // Limpar parâmetros da URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+            alert('✅ Email verificado com sucesso!\n\nJá pode fazer login na sua conta.');
+            // Fazer logout para garantir sessão limpa
+            try { await account.deleteSession('current'); } catch (e) { /* já sem sessão */ }
+            openLoginModal();
+            showLoginForm();
+        } catch (error) {
+            console.error('❌ Erro ao verificar email:', error);
+            window.history.replaceState({}, document.title, window.location.pathname);
+            alert('❌ Erro ao verificar o email.\n\nO link pode ter expirado. Tente fazer login para receber um novo link de verificação.');
+            openLoginModal();
+            showLoginForm();
+        }
+    }
 }
 
 function showUserProfile() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('registerForm').style.display = 'none';
     document.getElementById('userProfile').style.display = 'block';
+    const vp = document.getElementById('verificationPending');
+    if (vp) vp.style.display = 'none';
     
     if (state.user) {
         const userGreeting = document.getElementById('userGreeting');
@@ -1353,12 +1413,36 @@ async function handleLogin(e) {
         console.log('🔐 Autenticando no Appwrite...');
         
         // APENAS login via Appwrite - SEM FALLBACKS
-        await account.createEmailSession(email, password);
+        await account.createEmailPasswordSession(email, password);
         
         console.log('✅ Login bem-sucedido');
         
         // Obter dados do usuário autenticado
         const userData = await account.get();
+        
+        // Verificar se o email está confirmado (exceto admin)
+        if (!userData.emailVerification && userData.email !== 'danielcac19@gmail.com') {
+            console.warn('⚠️ Email não verificado:', userData.email);
+            // Aproveitar a sessão ativa para reenviar o email de verificação
+            const resend = confirm(
+                `❌ Email não verificado!\n\nA sua conta "${userData.email}" ainda não foi ativada.\n\nClique em OK para receber um novo email de verificação, ou Cancelar para fechar.`
+            );
+            if (resend) {
+                try {
+                    const verificationUrl = window.location.origin + window.location.pathname;
+                    await account.createVerification(verificationUrl);
+                    // Mostrar painel pendente com sessão ativa p/ futuro reenvio
+                    showVerificationPending(userData.email);
+                } catch (err) {
+                    console.error('Erro ao reenviar verificação:', err);
+                    try { await account.deleteSession('current'); } catch (e) { /* ok */ }
+                    alert('❌ Erro ao enviar email. Por favor, tente novamente.');
+                }
+            } else {
+                try { await account.deleteSession('current'); } catch (e) { /* ok */ }
+            }
+            return;
+        }
         
         // Atualizar lastLogin na base de dados
         await updateUserInDatabase(userData.$id, {
@@ -1568,12 +1652,11 @@ async function handleRegister(e) {
             
             console.log('✅ Conta criada com sucesso:', newAccount);
             
-            // Fazer login automático após registro
-            await account.createEmailSession(email, password);
+            // Criar sessão temporária para enviar email de verificação
+            await account.createEmailPasswordSession(email, password);
+            console.log('✅ Sessão temporária criada para verificação');
             
-            console.log('✅ Login automático realizado');
-            
-            // Obter dados do usuário
+            // Obter dados do utilizador
             const userData = await account.get();
             
             // Guardar dados do utilizador na coleção (base de dados)
@@ -1587,26 +1670,16 @@ async function handleRegister(e) {
                 country: 'Portugal'
             });
             
-            state.user = {
-                $id: userData.$id,
-                name: userData.name,
-                email: userData.email,
-                loginDate: new Date().toISOString(),
-                isAdmin: false
-            };
-            
-            localStorage.setItem('voidnix-user', JSON.stringify(state.user));
-            updateUserUI();
-            
-            alert(`✅ Conta criada com sucesso!\n\nBem-vindo à VoidNix, ${name}!`);
+            // Enviar email de verificação
+            const verificationUrl = window.location.origin + window.location.pathname;
+            await account.createVerification(verificationUrl);
+            console.log('✅ Email de verificação enviado para:', email);
             
             // Limpar formulário
             document.getElementById('registerFormElement').reset();
             
-            // Fechar modal
-            setTimeout(() => {
-                closeLoginModal();
-            }, 800);
+            // Mostrar ecrã de verificação pendente (não fazer login ainda)
+            showVerificationPending(email);
             
         } catch (error) {
             console.error('❌ Erro ao criar conta:', error);
@@ -1673,6 +1746,15 @@ async function loadUserFromLocalStorage() {
                 try {
                     // Verificar se a sessão ainda é válida
                     const session = await account.get();
+                    
+                    // Verificar se o email está confirmado
+                    if (!session.emailVerification && session.email !== 'danielcac19@gmail.com') {
+                        console.warn('⚠️ Email não verificado - bloqueando restauração de sessão');
+                        localStorage.removeItem('voidnix-user');
+                        state.user = null;
+                        showVerificationPending(session.email);
+                        return;
+                    }
                     
                     // Sessão válida - atualizar dados do usuário
                     state.user = {
@@ -1800,16 +1882,31 @@ function setupLoginListeners() {
     if (facebookBtn) {
         facebookBtn.addEventListener('click', handleFacebookLogin);
     }
+
+    // Verificação de email - reenviar
+    const resendBtn = document.getElementById('resendVerificationBtn');
+    if (resendBtn) {
+        resendBtn.addEventListener('click', resendVerificationEmail);
+    }
+
+    // Verificação de email - voltar ao login
+    const backToLoginFromVerify = document.getElementById('backToLoginFromVerify');
+    if (backToLoginFromVerify) {
+        backToLoginFromVerify.addEventListener('click', () => {
+            // Apagar sessão pendente e ir para login
+            if (account) {
+                account.deleteSession('current').catch(() => {});
+            }
+            showLoginForm();
+        });
+    }
 }
 
 // ===== LOGIN COM GOOGLE (APPWRITE) =====
 async function handleGoogleLogin() {
-    alert('⚠️ Login com Google temporariamente desativado.\n\nPor favor, crie uma conta com email e palavra-passe.');
-    return;
-    
     // Verificar se Appwrite está configurado
     if (!account) {
-        alert('⚠️ Appwrite não está configurado.');
+        alert('⚠️ Sistema de autenticação não disponível.');
         return;
     }
     
@@ -1819,18 +1916,19 @@ async function handleGoogleLogin() {
         // Criar sessão OAuth2 com Google
         // Redireciona para o Google e volta para a URL de sucesso
         const currentUrl = window.location.origin + window.location.pathname;
+        
         account.createOAuth2Session(
             'google',
-            currentUrl, // Success URL - usa a URL atual
-            currentUrl  // Failure URL - usa a URL atual
+            currentUrl + '?login=success', // Success URL
+            currentUrl + '?login=failed'   // Failure URL
         );
         
-        // A função createOAuth2Session redireciona automaticamente
-        // Quando o usuário voltar, vamos verificar a sessão
+        // A função createOAuth2Session redireciona automaticamente para o Google
+        // Quando o usuário voltar, a função checkAppwriteSession() irá detectar a sessão
         
     } catch (error) {
-        console.error('Erro no login com Google:', error);
-        alert(`Erro ao fazer login: ${error.message}`);
+        console.error('❌ Erro no login com Google:', error);
+        alert(`❌ Erro ao conectar com Google\n\n${error.message}\n\nTente criar uma conta com email e palavra-passe.`);
     }
 }
 
@@ -1904,6 +2002,13 @@ async function checkAppwriteSession() {
         
         console.log('✅ Usuário logado:', session);
         
+        // Verificar se o email está confirmado
+        if (!session.emailVerification && session.email !== 'danielcac19@gmail.com') {
+            console.warn('⚠️ Sessão com email não verificado detectada');
+            showVerificationPending(session.email);
+            return;
+        }
+        
         // Salvar no estado
         state.user = {
             name: session.name,
@@ -1936,22 +2041,53 @@ async function checkAppwriteSession() {
 }
 
 // ===== FUNCIONALIDADES DO PERFIL =====
-function saveOrder(items, total) {
-    const orders = JSON.parse(localStorage.getItem('voidnix-orders') || '[]');
-    
+async function saveOrder(items, total) {
     const newOrder = {
         id: Date.now(),
         date: new Date().toISOString(),
         items: items,
         total: total,
         status: 'Processando',
-        user: state.user ? state.user.email : 'guest'
+        user: state.user ? state.user.email : 'guest',
+        userId: state.user ? state.user.$id : null
     };
     
+    // Salvar no localStorage (backup local)
+    const orders = JSON.parse(localStorage.getItem('voidnix-orders') || '[]');
     orders.push(newOrder);
     localStorage.setItem('voidnix-orders', JSON.stringify(orders));
     
-    console.log('✅ Encomenda salva:', newOrder);
+    console.log('✅ Encomenda salva no localStorage:', newOrder);
+    
+    // Salvar no Appwrite Database (se disponível)
+    if (databases && appwriteConfig.invoicesCollectionId && state.user) {
+        try {
+            const invoiceData = {
+                orderId: newOrder.id.toString(),
+                userEmail: state.user.email,
+                userId: state.user.$id,
+                items: JSON.stringify(items),
+                total: total,
+                status: 'Processando',
+                createdAt: new Date().toISOString(),
+                paymentStatus: 'pending'
+            };
+            
+            const savedInvoice = await databases.createDocument(
+                appwriteConfig.databaseId,
+                appwriteConfig.invoicesCollectionId,
+                'unique()',
+                invoiceData
+            );
+            
+            console.log('✅ Encomenda salva no Appwrite:', savedInvoice);
+        } catch (error) {
+            console.error('⚠️ Erro ao salvar encomenda no Appwrite:', error);
+            // Não bloqueia o processo se falhar, pois já está no localStorage
+        }
+    }
+    
+    return newOrder;
 }
 
 function setupProfileMenuListeners() {
@@ -2039,21 +2175,52 @@ function setupProfileMenuListeners() {
     }
 }
 
-function showMyOrders() {
-    const allOrders = JSON.parse(localStorage.getItem('voidnix-orders') || '[]');
-    
-    // Filtrar apenas encomendas do usuário atual
+async function showMyOrders() {
+    let orders = [];
     const userEmail = state.user ? state.user.email : 'guest';
+    
     console.log('👤 Email do usuário:', userEmail);
-    console.log('📦 Total de encomendas:', allOrders.length);
-    console.log('📋 Todas as encomendas:', allOrders);
     
-    const orders = allOrders.filter(order => {
-        console.log(`Encomenda #${order.id}: user = "${order.user}"`);
-        return order.user === userEmail;
-    });
+    // Tentar carregar do Appwrite primeiro
+    if (databases && appwriteConfig.invoicesCollectionId && state.user) {
+        try {
+            console.log('📦 Carregando encomendas do Appwrite...');
+            const response = await databases.listDocuments(
+                appwriteConfig.databaseId,
+                appwriteConfig.invoicesCollectionId
+            );
+            
+            // Filtrar encomendas do usuário atual
+            const appwriteOrders = response.documents
+                .filter(doc => doc.userEmail === userEmail)
+                .map(doc => ({
+                    id: doc.orderId,
+                    date: doc.createdAt,
+                    items: JSON.parse(doc.items || '[]'),
+                    total: doc.total,
+                    status: doc.status,
+                    user: doc.userEmail
+                }));
+            
+            console.log(`✅ ${appwriteOrders.length} encomendas carregadas do Appwrite`);
+            orders = appwriteOrders;
+        } catch (error) {
+            console.warn('⚠️ Erro ao carregar do Appwrite, usando localStorage:', error);
+        }
+    }
     
-    console.log('✅ Encomendas filtradas para este usuário:', orders.length);
+    // Se não conseguiu do Appwrite, usar localStorage
+    if (orders.length === 0) {
+        const allOrders = JSON.parse(localStorage.getItem('voidnix-orders') || '[]');
+        console.log('📦 Total de encomendas no localStorage:', allOrders.length);
+        
+        orders = allOrders.filter(order => {
+            console.log(`Encomenda #${order.id}: user = "${order.user}"`);
+            return order.user === userEmail;
+        });
+        
+        console.log('✅ Encomendas filtradas do localStorage:', orders.length);
+    }
     
     const modal = document.getElementById('ordersModal');
     const content = document.getElementById('ordersContent');
@@ -2270,6 +2437,9 @@ async function init() {
     setupEventListeners();
     setupLoginListeners();
     setupProfileMenuListeners();
+    
+    // Verificar se o utilizador veio de um link de verificação de email
+    await checkEmailVerification();
     
     // Carregar produtos do Appwrite (já renderiza produtos locais se falhar)
     await loadProductsFromAppwrite();
