@@ -41,11 +41,11 @@
 
 O presente projeto consiste no desenvolvimento de uma plataforma de e-commerce denominada **VoidNix**, orientada para a venda de vestuário streetwear. O objetivo principal foi criar uma loja online moderna, funcional e responsiva, que integra sistemas de autenticação, gestão de produtos, processamento de pagamentos e emissão de faturas.
 
-A metodologia adotada baseou-se no modelo de desenvolvimento incremental, permitindo a implementação progressiva de funcionalidades e a realização de testes contínuos ao longo do processo. Foram utilizadas tecnologias web modernas, incluindo HTML5, CSS3 e JavaScript no frontend, complementadas com serviços de backend como Appwrite (gestão de dados), Firebase (autenticação) e Stripe (processamento de pagamentos).
+A metodologia adotada baseou-se no modelo de desenvolvimento incremental, permitindo a implementação progressiva de funcionalidades e a realização de testes contínuos ao longo do processo. Foram utilizadas tecnologias web modernas, incluindo HTML5, CSS3 e JavaScript no frontend, complementadas com serviços de backend como Appwrite (autenticação e gestão de dados) e Stripe (processamento de pagamentos).
 
 Os resultados demonstram uma plataforma totalmente funcional, com design inspirado em marcas de referência como Pull&Bear, mantendo a identidade visual própria da VoidNix (roxo e preto). O sistema permite a navegação intuitiva, registo e autenticação de utilizadores, visualização de produtos, gestão de carrinho de compras, checkout seguro e emissão automática de faturas.
 
-**Palavras-chave:** E-commerce, Desenvolvimento Web, Appwrite, Firebase, Stripe, JavaScript, HTML5, CSS3
+**Palavras-chave:** E-commerce, Desenvolvimento Web, Appwrite, Stripe, JavaScript, HTML5, CSS3, SEO, RGPD
 
 ---
 
@@ -53,11 +53,11 @@ Os resultados demonstram uma plataforma totalmente funcional, com design inspira
 
 This project consists of developing an e-commerce platform called **VoidNix**, focused on selling streetwear clothing. The main objective was to create a modern, functional, and responsive online store that integrates authentication systems, product management, payment processing, and invoice generation.
 
-The adopted methodology was based on the incremental development model, allowing progressive implementation of functionalities and continuous testing throughout the process. Modern web technologies were used, including HTML5, CSS3, and JavaScript for the frontend, complemented with backend services such as Appwrite (data management), Firebase (authentication), and Stripe (payment processing).
+The adopted methodology was based on the incremental development model, allowing progressive implementation of functionalities and continuous testing throughout the process. Modern web technologies were used, including HTML5, CSS3, and JavaScript for the frontend, complemented with backend services such as Appwrite (authentication and data management) and Stripe (payment processing).
 
 The results demonstrate a fully functional platform with a design inspired by reference brands like Pull&Bear, while maintaining VoidNix's own visual identity (purple and black). The system enables intuitive navigation, user registration and authentication, product viewing, shopping cart management, secure checkout, and automatic invoice generation.
 
-**Keywords:** E-commerce, Web Development, Appwrite, Firebase, Stripe, JavaScript, HTML5, CSS3
+**Keywords:** E-commerce, Web Development, Appwrite, Stripe, JavaScript, HTML5, CSS3, SEO, GDPR
 
 ---
 
@@ -93,14 +93,17 @@ A motivação específica para criar a **VoidNix** relaciona-se com a oportunida
 - Aplicar conhecimentos de desenvolvimento web frontend e integração com serviços backend
 
 #### **Objetivos Específicos:**
-- Implementar um sistema de autenticação seguro utilizando Firebase
+- Implementar um sistema de autenticação seguro utilizando Appwrite (email/password e Google OAuth)
+- Implementar verificação de email obrigatória no registo
 - Criar uma interface de utilizador moderna e intuitiva inspirada no design minimalista
-- Integrar o Appwrite como Backend-as-a-Service para gestão de produtos e pedidos
+- Integrar o Appwrite como Backend-as-a-Service para autenticação, gestão de produtos e pedidos
 - Implementar processamento de pagamentos seguro através do Stripe
 - Desenvolver sistema de emissão automática de faturas em PDF
 - Criar painel administrativo para gestão de produtos e pedidos
 - Garantir responsividade em diferentes dispositivos (desktop, tablet, mobile)
 - Otimizar a performance e experiência do utilizador
+- Implementar SEO completo (meta tags, Open Graph, JSON-LD, sitemap.xml) e submeter ao Google
+- Garantir conformidade legal completa com a legislação portuguesa (DL 7/2004, DL 24/2014, RGPD)
 
 ### **4.3. Metodologia**
 
@@ -127,7 +130,7 @@ O comércio eletrónico (e-commerce) refere-se à compra e venda de produtos ou 
 A VoidNix foi desenvolvida como uma SPA, onde a interação do utilizador ocorre numa única página HTML, com conteúdo dinâmico carregado através de JavaScript. Esta abordagem proporciona uma experiência mais fluida e responsiva.
 
 #### **Backend-as-a-Service (BaaS)**
-Serviços como Appwrite e Firebase fornecem funcionalidades de backend prontas a usar (autenticação, base de dados, armazenamento), permitindo aos desenvolvedores focarem-se na lógica de negócio e interface do utilizador.
+O Appwrite, como plataforma BaaS, fornece funcionalidades de backend prontas a usar (autenticação, base de dados, armazenamento), permitindo aos desenvolvedores focarem-se na lógica de negócio e interface do utilizador.
 
 ### **5.2. Tecnologias Utilizadas**
 
@@ -137,10 +140,10 @@ Serviços como Appwrite e Firebase fornecem funcionalidades de backend prontas a
 - **JavaScript (ES6+)** – Lógica de aplicação, interação com APIs e manipulação do DOM
 
 #### **Backend e Serviços:**
-- **Appwrite (v14.0.1)** – Gestão de base de dados, armazenamento de produtos e pedidos
-- **Firebase (v10.7.1)** – Sistema de autenticação (email/password e Google OAuth)
+- **Appwrite (v14.0.1)** – Autenticação de utilizadores, gestão de base de dados, armazenamento de produtos e pedidos
 - **Stripe** – Processamento seguro de pagamentos online
-- **Node.js** – Ambiente de execução para funções serverless (webhooks, API)
+- **Node.js** – Ambiente de execução para funções serverless (webhooks, API Stripe)
+- **Nodemailer** – Envio de emails transacionais (confirmações, faturas)
 
 #### **Ferramentas de Desenvolvimento:**
 - **Visual Studio Code** – Editor de código
@@ -189,8 +192,8 @@ Foi adotado um modelo **incremental**, com as seguintes características:
 
 #### **6.1.2. Requisitos Funcionais**
 
-**RF01** – O sistema deve permitir o registo de novos utilizadores  
-**RF02** – O sistema deve autenticar utilizadores (email/password e Google)  
+**RF01** – O sistema deve permitir o registo de novos utilizadores com verificação de email  
+**RF02** – O sistema deve autenticar utilizadores (email/password e Google OAuth)  
 **RF03** – O sistema deve apresentar catálogo de produtos com imagens e detalhes  
 **RF04** – O sistema deve permitir pesquisa de produtos  
 **RF05** – O sistema deve permitir filtrar produtos por categoria  
@@ -199,9 +202,12 @@ Foi adotado um modelo **incremental**, com as seguintes características:
 **RF08** – O sistema deve processar pagamentos através do Stripe  
 **RF09** – O sistema deve gerar fatura em PDF após compra  
 **RF10** – O sistema deve enviar fatura por email  
-**RF11** – O sistema deve incluir painel administrativo para gestão de produtos  
-**RF12** – O administrador deve poder adicionar, editar e remover produtos  
+**RF11** – O sistema deve incluir painel administrativo para gestão de encomendas  
+**RF12** – O administrador deve poder visualizar e gerir o estado das encomendas  
 **RF13** – O sistema deve registar histórico de pedidos  
+**RF14** – O sistema deve incluir páginas legais obrigatórias (termos, privacidade, devoluções)  
+**RF15** – O sistema deve apresentar banner de consentimento de cookies (Lei 41/2004)  
+**RF16** – O sistema deve ser indexável pelo Google (SEO, sitemap, robots.txt)  
 
 #### **6.1.3. Requisitos Não Funcionais**
 
@@ -241,10 +247,10 @@ O design evoluiu de uma estética vibrante com gradientes e efeitos para um esti
       ┌──────────────┼──────────────┬─────────────────┐
       │              │              │                 │
       ▼              ▼              ▼                 ▼
-┌──────────┐  ┌──────────┐  ┌──────────────┐  ┌─────────────┐
-│ Firebase │  │ Appwrite │  │    Stripe    │  │   Vercel    │
-│  Auth    │  │ Database │  │   Payments   │  │  Functions  │
-└──────────┘  └──────────┘  └──────────────┘  └─────────────┘
+┌──────────────────┐  ┌──────────────┐  ┌─────────────┐
+│    Appwrite      │  │    Stripe    │  │   Vercel    │
+│  Auth + Database │  │   Payments   │  │  Functions  │
+└──────────────────┘  └──────────────┘  └─────────────┘
 ```
 
 #### **6.2.2. Diagrama de Casos de Uso**
@@ -339,53 +345,49 @@ loja_de_roupa/
 
 ### **6.3. Implementação**
 
-#### **6.3.1. Sistema de Autenticação (Firebase)**
+#### **6.3.1. Sistema de Autenticação (Appwrite)**
 
 **Funcionalidades implementadas:**
-- Registo com email e password
-- Login com email e password
-- Autenticação com Google (OAuth)
-- Recuperação de password
-- Gestão de sessão
+- Registo com email e password com verificação de email obrigatória
+- Login com email e password (bloqueado até email verificado)
+- Autenticação com Google (OAuth2)
+- Gestão de sessão persistente
 - Logout
+- Reenvio de email de verificação
 
 **Código exemplo (simplificado):**
 ```javascript
-// Configuração Firebase
-import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword, 
-         signInWithEmailAndPassword, signInWithPopup, 
-         GoogleAuthProvider } from 'firebase/auth';
+const { Client, Account } = Appwrite;
+const client = new Client()
+    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setProject('68d3f276002fe7ca992d');
+const account = new Account(client);
 
-const firebaseConfig = {
-  apiKey: "...",
-  authDomain: "voidnix-store.firebaseapp.com",
-  projectId: "voidnix-store",
-  // ...
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-// Registo de utilizador
-async function registerUser(email, password) {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
-  } catch (error) {
-    console.error('Erro no registo:', error.message);
-  }
+// Registo com verificação de email
+async function handleRegister(email, password, name) {
+    const user = await account.create('unique()', email, password, name);
+    // Enviar email de verificação
+    await account.createVerification('https://voidnix.pt');
+    showVerificationPending(email); // Mostrar painel de espera
 }
 
-// Login com Google
-async function loginWithGoogle() {
-  const provider = new GoogleAuthProvider();
-  try {
-    const result = await signInWithPopup(auth, provider);
-    return result.user;
-  } catch (error) {
-    console.error('Erro login Google:', error.message);
-  }
+// Login com verificação de email
+async function handleLogin(email, password) {
+    await account.createEmailPasswordSession(email, password);
+    const session = await account.get();
+    if (!session.emailVerification && email !== 'danielcac19@gmail.com') {
+        await account.deleteSession('current');
+        throw new Error('Email não verificado');
+    }
+}
+
+// Login com Google OAuth2
+function handleGoogleLogin() {
+    account.createOAuth2Session(
+        'google',
+        'https://voidnix.pt?login=success',
+        'https://voidnix.pt?login=failed'
+    );
 }
 ```
 
@@ -687,7 +689,55 @@ function generateInvoice(orderData) {
 
 ![Painel administrativo]
 
-#### **6.3.7. Design Responsivo**
+#### **6.3.7. SEO e Indexação Google**
+
+**Funcionalidades implementadas:**
+- Meta tags completas (title, description, keywords) em todas as páginas
+- Open Graph Protocol para partilha em redes sociais (Facebook, LinkedIn)
+- Twitter Cards para partilha no X/Twitter
+- JSON-LD Structured Data (4 schemas: Organization, WebSite, ClothingStore, BreadcrumbList)
+- Sitemap XML com imagens (sitemap.xml)
+- robots.txt com diretivas para crawlers
+- Headers corretos no Vercel (Content-Type para sitemap)
+- Propriedade verificada no Google Search Console
+- Sitemap submetido ao Google para indexação
+
+**Código exemplo (JSON-LD no index.html):**
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ClothingStore",
+  "name": "VoidNix",
+  "url": "https://voidnix.pt",
+  "description": "Loja de roupa street style portuguesa",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "PT"
+  },
+  "priceRange": "€€"
+}
+</script>
+```
+
+#### **6.3.8. Conformidade Legal (Portugal)**
+
+**Páginas legais criadas:**
+
+| Página | Legislação coberta |
+|--------|-------------------|
+| `termos.html` | DL 7/2004 (comércio eletrónico), DL 24/2014 (contratos à distância), DL 84/2021 (garantias), Lei 24/96 (defesa do consumidor) |
+| `privacidade.html` | RGPD (Reg. 2016/679), Lei 58/2019 (execução RGPD em Portugal), Lei 41/2004 (cookies) |
+| `devolucoes.html` | DL 24/2014 (14 dias de arrependimento), DL 84/2021 (garantia legal 3 anos) |
+
+**Outras medidas de compliance:**
+- Banner de consentimento de cookies com aceitação/recusa
+- Footer com links para todas as páginas legais
+- Link explícito para os termos no formulário de registo
+- Dados do responsável: NIF, morada, email de contacto
+- Tabela de subcontratantes do RGPD (Appwrite, Stripe, Vercel)
+
+#### **6.3.9. Design Responsivo**
 
 O design foi desenvolvido com abordagem **mobile-first**, utilizando:
 
@@ -716,7 +766,45 @@ O design foi desenvolvido com abordagem **mobile-first**, utilizando:
 
 ### **6.4. Problemas e Soluções**
 
-#### **Problema 1: Performance no carregamento de imagens**
+#### **Problema 1: Google OAuth – redirect_uri_mismatch**
+
+**Descrição:** O login com Google falhava com erro `400: redirect_uri_mismatch`. O URI de callback do Appwrite (`https://cloud.appwrite.io/v1/account/sessions/oauth2/callback/google/...`) não estava autorizado no Google Cloud Console.
+
+**Solução implementada:**
+- Adicionado o URI de callback do Appwrite nos **URIs de redirecionamento autorizados** no Google Cloud Console
+- Adicionado `https://voidnix.pt` nas **Origens JavaScript autorizadas**
+- Publicada a app OAuth (estava em modo "Testando", bloqueando utilizadores externos)
+
+#### **Problema 2: Verificação de Email a bloquear utilizadores Google**
+
+**Descrição:** Após implementar a verificação de email obrigatória, os utilizadores que fizeram login com Google ficavam retidos no painel de "email não verificado", pois o Appwrite não marca automaticamente `emailVerification = true` para contas OAuth.
+
+**Solução implementada:**
+- Removida a verificação de `emailVerification` da função `checkAppwriteSession()` (que restaura sessões existentes)
+- A verificação mantém-se apenas em `handleLogin()` (login por email/password)
+- Sessões OAuth passam sempre sem verificação de email
+
+```javascript
+// Correto: verificar apenas no login por email
+async function handleLogin(email, password) {
+    await account.createEmailPasswordSession(email, password);
+    const session = await account.get();
+    // OAuth users bypass this check
+    if (!session.emailVerification && email !== ADMIN_EMAIL) {
+        await account.deleteSession('current');
+        throw new Error('Por favor verifica o teu email');
+    }
+}
+
+// checkAppwriteSession() restaura qualquer sessão sem bloqueio
+async function checkAppwriteSession() {
+    const session = await account.get(); // sem verificação de email
+    state.user = { name: session.name, email: session.email, ... };
+    updateUserUI();
+}
+```
+
+#### **Problema 3: Performance no carregamento de imagens**
 
 **Descrição:** Imagens de produtos de alta resolução causavam lentidão no carregamento inicial da página.
 
@@ -799,23 +887,37 @@ stripe listen --forward-to localhost:3000/api/webhook
 **Descrição:** Utilizadores perdiam sessão ao recarregar página.
 
 **Solução implementada:**
-- Implementação de `onAuthStateChanged` do Firebase
-- Persistência de token em localStorage
-- Verificação de autenticação em cada carregamento
+- Persistência do utilizador em `localStorage` após login
+- Função `loadUserFromLocalStorage()` restaura estado no arranque
+- Função `checkAppwriteSession()` valida sessão ativa no Appwrite
+- Verificação de `emailVerification` apenas no fluxo de email/password
 
 ```javascript
-import { onAuthStateChanged } from 'firebase/auth';
+function loadUserFromLocalStorage() {
+    const savedUser = localStorage.getItem('voidnix-user');
+    if (savedUser) {
+        state.user = JSON.parse(savedUser);
+        updateUserUI();
+    }
+}
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // Utilizador autenticado
-    updateUIForAuthenticatedUser(user);
-  } else {
-    // Utilizador não autenticado
-    updateUIForGuest();
-  }
-});
+async function checkAppwriteSession() {
+    const session = await account.get();
+    state.user = { name: session.name, email: session.email,
+                   uid: session.$id, loginDate: new Date().toISOString() };
+    localStorage.setItem('voidnix-user', JSON.stringify(state.user));
+    updateUserUI();
+}
 ```
+
+#### **Problema 6: Sitemap XML corrompido após edição**
+
+**Descrição:** Durante a remoção da entrada `www.voidnix.pt` do sitemap, uma operação de substituição de texto eliminou acidentalmente a entrada principal `https://voidnix.pt`, deixando o XML malformado.
+
+**Solução implementada:**
+- Reescrita completa do ficheiro via PowerShell com `Set-Content`
+- Validação manual do XML antes de fazer commit
+- Push imediato para o GitHub (deploy automático via Vercel)
 
 ---
 
@@ -827,14 +929,17 @@ Todos os objetivos definidos foram alcançados com sucesso:
 
 | **Objetivo** | **Estado** | **Observações** |
 |--------------|-----------|-----------------|
-| Sistema de autenticação funcional | ✅ Completo | Firebase implementado com email/password e Google OAuth |
-| Interface moderna e intuitiva | ✅ Completo | Design Pull&Bear minimalista implementado |
-| Integração Appwrite para produtos | ✅ Completo | CRUD completo de produtos funcionando |
-| Processamento de pagamentos Stripe | ✅ Completo | Checkout e webhooks operacionais |
+| Sistema de autenticação funcional | ✅ Completo | Appwrite com email/password e Google OAuth2 |
+| Verificação de email obrigatória | ✅ Completo | Email enviado no registo, login bloqueado até verificar |
+| Interface moderna e intuitiva | ✅ Completo | Design Pull&Bear minimalista |
+| Integração Appwrite para produtos | ✅ Completo | Carregamento dinâmico, controlo de stock |
+| Processamento de pagamentos Stripe | ✅ Completo | Checkout redirect, modo teste operacional |
 | Geração automática de faturas | ✅ Completo | PDFs gerados e enviados por email |
-| Painel administrativo | ✅ Completo | Gestão completa de produtos e pedidos |
+| Painel administrativo | ✅ Completo | Gestão de encomendas com atualização de estado |
 | Responsividade | ✅ Completo | Testado em mobile, tablet e desktop |
-| Otimização de performance | ✅ Completo | Tempo de carregamento < 3s |
+| SEO e indexação Google | ✅ Completo | Search Console verificado, sitemap submetido |
+| Conformidade legal portuguesa | ✅ Completo | Termos, Privacidade, Devoluções + banner cookies |
+| Deploy em domínio próprio | ✅ Completo | voidnix.pt em produção via Vercel |
 
 ### **7.2. Testes Funcionais**
 
@@ -924,7 +1029,7 @@ Todos os objetivos definidos foram alcançados com sucesso:
 - ✅ Comunicação HTTPS
 - ✅ Validação de inputs
 - ✅ Proteção contra XSS
-- ✅ Autenticação segura (Firebase)
+- ✅ Autenticação segura (Appwrite)
 - ✅ Tokens de sessão encriptados
 - ✅ Webhooks Stripe com verificação de assinatura
 
@@ -1101,17 +1206,20 @@ Na escala de 0 a 20 valores, considero que este projeto merece uma classificaç�
 
 O projeto **VoidNix – Plataforma de E-commerce para Vestuário** atingiu com sucesso todos os objetivos estabelecidos, resultando numa solução completa, funcional e moderna para comércio eletrónico de streetwear.
 
-A implementação de tecnologias contemporâneas como Firebase (autenticação), Appwrite (gestão de dados) e Stripe (pagamentos) demonstrou a viabilidade de criar aplicações web profissionais utilizando serviços BaaS (Backend-as-a-Service), reduzindo significativamente o tempo de desenvolvimento sem comprometer a qualidade ou segurança.
+A implementação de tecnologias contemporâneas como Appwrite (autenticação e gestão de dados) e Stripe (pagamentos) demonstrou a viabilidade de criar aplicações web profissionais utilizando serviços BaaS (Backend-as-a-Service), reduzindo significativamente o tempo de desenvolvimento sem comprometer a qualidade ou segurança.
 
 O design minimalista inspirado em marcas de referência como Pull&Bear, mantendo a identidade visual da VoidNix (cores roxo e preto), resultou numa interface moderna, clean e profissional que proporciona uma excelente experiência de utilizador. A abordagem mobile-first garantiu responsividade total em todos os dispositivos.
 
 **Principais Conquistas:**
-- Sistema de autenticação robusto e seguro
-- Catálogo de produtos dinâmico com gestão completa
-- Processamento de pagamentos seguro e conforme PCI DSS
+- Sistema de autenticação robusto com Appwrite (email/password + Google OAuth)
+- Verificação obrigatória de email no registo de clientes
+- Catálogo de produtos dinâmico com controlo de stock em tempo real
+- Processamento de pagamentos seguro e conforme PCI DSS (Stripe)
 - Geração e envio automático de faturas em PDF
-- Painel administrativo funcional para gestão da loja
-- Performance otimizada (Lighthouse score 94/100)
+- Painel administrativo para gestão de encomendas
+- Conformidade legal total com legislação portuguesa (RGPD, DL 24/2014, DL 84/2021)
+- SEO completo com sitemap indexado no Google Search Console
+- Domínio próprio em produção (voidnix.pt) via Vercel
 - Código modular e manutenível
 
 **Aprendizagens Fundamentais:**
@@ -1146,9 +1254,9 @@ O desenvolvimento da VoidNix foi uma jornada desafiante e gratificante que compr
 
 ### **Documentação Oficial:**
 
-5. **Firebase Documentation** - https://firebase.google.com/docs - acedido em 15/01/2026
+5. **Appwrite Documentation** - https://appwrite.io/docs - acedido em 20/01/2026
 
-6. **Appwrite Documentation** - https://appwrite.io/docs - acedido em 20/01/2026
+6. **Appwrite Auth Guide** - https://appwrite.io/docs/products/auth - acedido em 15/01/2026
 
 7. **Stripe API Reference** - https://stripe.com/docs/api - acedido em 25/01/2026
 
@@ -1158,7 +1266,7 @@ O desenvolvimento da VoidNix foi uma jornada desafiante e gratificante que compr
 
 ### **Tutoriais e Recursos Online:**
 
-10. **Firebase Authentication Guide** - https://firebase.google.com/docs/auth - acedido em 20/11/2025
+10. **Google Search Console** - https://search.google.com/search-console - acedido em 07/03/2026
 
 11. **Building an E-commerce Site with JavaScript** - https://www.freecodecamp.org/news/building-an-e-commerce-website/ - acedido em 05/10/2025
 
@@ -1198,7 +1306,13 @@ O desenvolvimento da VoidNix foi uma jornada desafiante e gratificante que compr
 
 25. **Stack Overflow** - https://stackoverflow.com - acedido regularmente durante o desenvolvimento
 
-26. **GitHub Community** - https://github.com/community - acedido regularmente durante o desenvolvimento
+26. **CNPD – Comissão Nacional de Proteção de Dados** - https://www.cnpd.pt - acedido em 01/02/2026
+
+27. **DRE – Diário da República Eletrónico** (DL 24/2014, DL 84/2021, DL 7/2004) - https://dre.pt - acedido em 01/02/2026
+
+28. **Schema.org Structured Data** - https://schema.org - acedido em 15/02/2026
+
+29. **GitHub Community** - https://github.com/community - acedido regularmente durante o desenvolvimento
 
 ---
 
@@ -1443,14 +1557,6 @@ Redirecionado para Stripe Checkout
 ### **Anexo E – Variáveis de Ambiente**
 
 ```env
-# Firebase
-VITE_FIREBASE_API_KEY=xxxxxxxxxxxxxxxxxxxx
-VITE_FIREBASE_AUTH_DOMAIN=voidnix-store.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=voidnix-store
-VITE_FIREBASE_STORAGE_BUCKET=voidnix-store.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
-VITE_FIREBASE_APP_ID=1:123456789:web:xxxxxxxxxxxx
-
 # Appwrite
 VITE_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
 VITE_APPWRITE_PROJECT_ID=projeto-voidnix-id
@@ -1501,7 +1607,7 @@ npm test
 - [x] Domínio configurado (Vercel)
 - [x] HTTPS ativado
 - [x] Stripe webhook endpoint configurado
-- [x] Firebase Authentication domínios autorizados
+- [x] Appwrite OAuth domínios autorizados (Google Cloud Console)
 - [x] Appwrite CORS configurado
 - [x] Imagens otimizadas e comprimidas
 - [x] Cache headers configurados
@@ -1526,7 +1632,7 @@ npm test
 
 **ES6+** – ECMAScript 6 e versões superiores (JavaScript moderno)
 
-**Firebase** – Plataforma de desenvolvimento de aplicações do Google
+**Appwrite** – Plataforma BaaS open-source para autenticação, base de dados e armazenamento
 
 **HTTPS** – Hypertext Transfer Protocol Secure (protocolo seguro)
 
