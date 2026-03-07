@@ -2012,8 +2012,18 @@ async function checkAppwriteSession() {
             return;
         }
 
+        // Verificar o provider da sessão atual
+        let isOAuthSession = false;
+        try {
+            const currentSession = await account.getSession('current');
+            isOAuthSession = currentSession.provider && currentSession.provider !== '' && currentSession.provider !== 'email';
+            console.log('📋 Provider da sessão:', currentSession.provider);
+        } catch (e) {
+            // ignora erro ao obter sessão
+        }
+
         // Verificar se o email está confirmado — OAuth (Google) não precisa de verificação
-        if (!session.emailVerification && !isOAuthReturn && session.email !== 'danielcac19@gmail.com') {
+        if (!session.emailVerification && !isOAuthReturn && !isOAuthSession && session.email !== 'danielcac19@gmail.com') {
             console.warn('⚠️ Sessão com email não verificado detectada');
             showVerificationPending(session.email);
             return;
@@ -2025,7 +2035,7 @@ async function checkAppwriteSession() {
             email: session.email,
             photoURL: session.prefs?.photoURL || null,
             uid: session.$id,
-            provider: isOAuthReturn ? 'google' : 'email',
+            provider: (isOAuthReturn || isOAuthSession) ? 'google' : 'email',
             loginDate: new Date().toISOString()
         };
         
@@ -2035,9 +2045,8 @@ async function checkAppwriteSession() {
         // Atualizar UI
         updateUserUI();
         
-        // Mostrar mensagem de boas-vindas (apenas se acabou de fazer login via Google)
+        // Fechar modal se veio do OAuth
         if (isOAuthReturn) {
-            // Limpar URL
             window.history.replaceState({}, document.title, window.location.pathname);
             closeLoginModal();
         }
