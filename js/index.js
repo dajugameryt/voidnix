@@ -2002,8 +2002,18 @@ async function checkAppwriteSession() {
         
         console.log('✅ Usuário logado:', session);
         
-        // Verificar se o email está confirmado
-        if (!session.emailVerification && session.email !== 'danielcac19@gmail.com') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isOAuthReturn = urlParams.get('login') === 'success';
+        const isOAuthFailed = urlParams.get('login') === 'failed';
+
+        if (isOAuthFailed) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            alert('❌ Login com Google falhou. Tenta novamente.');
+            return;
+        }
+
+        // Verificar se o email está confirmado — OAuth (Google) não precisa de verificação
+        if (!session.emailVerification && !isOAuthReturn && session.email !== 'danielcac19@gmail.com') {
             console.warn('⚠️ Sessão com email não verificado detectada');
             showVerificationPending(session.email);
             return;
@@ -2015,7 +2025,7 @@ async function checkAppwriteSession() {
             email: session.email,
             photoURL: session.prefs?.photoURL || null,
             uid: session.$id,
-            provider: 'google',
+            provider: isOAuthReturn ? 'google' : 'email',
             loginDate: new Date().toISOString()
         };
         
@@ -2025,10 +2035,8 @@ async function checkAppwriteSession() {
         // Atualizar UI
         updateUserUI();
         
-        // Mostrar mensagem de boas-vindas (apenas se acabou de fazer login)
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('success')) {
-            alert(`✅ Login realizado com sucesso!\nBem-vindo, ${session.name}!`);
+        // Mostrar mensagem de boas-vindas (apenas se acabou de fazer login via Google)
+        if (isOAuthReturn) {
             // Limpar URL
             window.history.replaceState({}, document.title, window.location.pathname);
             closeLoginModal();
