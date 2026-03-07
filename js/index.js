@@ -2360,14 +2360,14 @@ function showSettings() {
                     <div class="settings-label">Nome</div>
                     <div class="settings-value">${state.user.name || 'Não definido'}</div>
                 </div>
-                <button class="btn-edit" onclick="alert('Edição de perfil em desenvolvimento!')">Editar</button>
+                <button style="padding:6px 14px;border:1px solid #9333ea;color:#9333ea;background:transparent;border-radius:4px;cursor:pointer;font-size:13px;" onclick="alert('Edição de perfil em desenvolvimento!')">Editar</button>
             </div>
             <div class="settings-item">
                 <div>
                     <div class="settings-label">Email</div>
                     <div class="settings-value">${state.user.email || 'Não definido'}</div>
                 </div>
-                <button class="btn-edit" onclick="alert('Edição de email em desenvolvimento!')">Editar</button>
+                <button style="padding:6px 14px;border:1px solid #9333ea;color:#9333ea;background:transparent;border-radius:4px;cursor:pointer;font-size:13px;" onclick="alert('Edição de email em desenvolvimento!')">Editar</button>
             </div>
         </div>
         
