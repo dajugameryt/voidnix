@@ -2987,7 +2987,7 @@ footer {
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background: var(--dark);
+  background: #f5f5f5;
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 8px;
   margin-bottom: 8px;
@@ -2995,10 +2995,11 @@ footer {
 
 .settings-label {
   font-weight: 500;
+  color: #333;
 }
 
 .settings-value {
-  color: var(--muted);
+  color: #555;
 }
 
 .btn-edit {
