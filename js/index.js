@@ -2012,30 +2012,13 @@ async function checkAppwriteSession() {
             return;
         }
 
-        // Verificar o provider da sessão atual
-        let isOAuthSession = false;
-        try {
-            const currentSession = await account.getSession('current');
-            isOAuthSession = currentSession.provider && currentSession.provider !== '' && currentSession.provider !== 'email';
-            console.log('📋 Provider da sessão:', currentSession.provider);
-        } catch (e) {
-            // ignora erro ao obter sessão
-        }
-
-        // Verificar se o email está confirmado — OAuth (Google) não precisa de verificação
-        if (!session.emailVerification && !isOAuthReturn && !isOAuthSession && session.email !== 'danielcac19@gmail.com') {
-            console.warn('⚠️ Sessão com email não verificado detectada');
-            showVerificationPending(session.email);
-            return;
-        }
-        
         // Salvar no estado
         state.user = {
             name: session.name,
             email: session.email,
             photoURL: session.prefs?.photoURL || null,
             uid: session.$id,
-            provider: (isOAuthReturn || isOAuthSession) ? 'google' : 'email',
+            provider: isOAuthReturn ? 'google' : 'email',
             loginDate: new Date().toISOString()
         };
         
