@@ -993,6 +993,103 @@ function setupEventListeners() {
     
     // Checkout com Stripe
     elements.checkoutBtn.addEventListener('click', handleCheckout);
+    
+    // Links de navegação - Novidades e Ofertas
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+            
+            if (href === '#novidades') {
+                e.preventDefault();
+                // Ativar filtro de novidades
+                state.filters.new = true;
+                state.filters.sale = false;
+                state.currentTab = 'all';
+                
+                // Atualizar checkbox
+                const filterNew = document.getElementById('filterNew');
+                const filterSale = document.getElementById('filterSale');
+                if (filterNew) filterNew.checked = true;
+                if (filterSale) filterSale.checked = false;
+                
+                // Atualizar UI dos tabs
+                elements.tabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                const allTab = document.querySelector('[data-tab="all"]');
+                if (allTab) {
+                    allTab.classList.add('active');
+                    allTab.setAttribute('aria-selected', 'true');
+                }
+                
+                // Marcar link como ativo
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                renderProducts();
+            } else if (href === '#ofertas') {
+                e.preventDefault();
+                // Ativar filtro de ofertas
+                state.filters.sale = true;
+                state.filters.new = false;
+                state.currentTab = 'all';
+                
+                // Atualizar checkbox
+                const filterNew = document.getElementById('filterNew');
+                const filterSale = document.getElementById('filterSale');
+                if (filterNew) filterNew.checked = false;
+                if (filterSale) filterSale.checked = true;
+                
+                // Atualizar UI dos tabs
+                elements.tabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                const allTab = document.querySelector('[data-tab="all"]');
+                if (allTab) {
+                    allTab.classList.add('active');
+                    allTab.setAttribute('aria-selected', 'true');
+                }
+                
+                // Marcar link como ativo
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                renderProducts();
+            } else if (href === '#loja') {
+                e.preventDefault();
+                // Desativar filtros e voltar para a loja completa
+                state.filters.new = false;
+                state.filters.sale = false;
+                state.currentTab = 'all';
+                
+                // Atualizar checkboxes
+                const filterNew = document.getElementById('filterNew');
+                const filterSale = document.getElementById('filterSale');
+                if (filterNew) filterNew.checked = false;
+                if (filterSale) filterSale.checked = false;
+                
+                // Atualizar UI dos tabs
+                elements.tabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                const allTab = document.querySelector('[data-tab="all"]');
+                if (allTab) {
+                    allTab.classList.add('active');
+                    allTab.setAttribute('aria-selected', 'true');
+                }
+                
+                // Marcar link como ativo
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                renderProducts();
+            }
+        });
+    });
 }
 
 // ===== REDUZIR STOCK APÓS COMPRA =====
