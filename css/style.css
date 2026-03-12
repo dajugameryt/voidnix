@@ -3042,3 +3042,127 @@ footer {
     gap: 8px;
   }
 }
+
+/* ===== MODAL DE TERMOS E CONDIÇÕES ===== */
+.terms-modal .profile-modal-content {
+  max-width: 800px;
+  max-height: 90vh;
+}
+
+.terms-content {
+  line-height: 1.7;
+  color: #2c3e50;
+}
+
+.terms-intro {
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border-left: 4px solid #667eea;
+}
+
+.terms-intro p {
+  margin: 0;
+  font-size: 16px;
+  color: #555;
+}
+
+.terms-section {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.terms-section:last-of-type {
+  border-bottom: none;
+}
+
+.terms-section h3 {
+  color: #2c3e50;
+  font-size: 20px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terms-section p {
+  margin-bottom: 12px;
+  color: #555;
+}
+
+.terms-section ul {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.terms-section li {
+  margin-bottom: 8px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.terms-note {
+  background: #fff8e1;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  border-left: 3px solid #ffc107;
+  font-size: 14px;
+}
+
+.terms-note strong {
+  color: #f57c00;
+}
+
+.terms-footer {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 2px solid #e8e8e8;
+  text-align: center;
+  color: #888;
+}
+
+.terms-footer p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.terms-friendly-note {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 24px;
+  text-align: center;
+}
+
+.terms-friendly-note p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+  .terms-modal .profile-modal-content {
+    max-height: 85vh;
+  }
+  
+  .terms-section h3 {
+    font-size: 18px;
+  }
+  
+  .terms-intro,
+  .terms-friendly-note {
+    padding: 16px;
+  }
+  
+  .terms-section {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+  }
+}
