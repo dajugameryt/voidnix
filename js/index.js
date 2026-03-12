@@ -72,7 +72,7 @@ async function loadProductsFromAppwrite() {
                 
                 const stock = parseInt(doc.stockQuantity) || 0;
                 
-                console.log(`📦 Produto: ${doc.productName}, Stock: ${stock}, Sizes: ${sizes.join(', ')}, onSale: ${doc.onSale}`);
+                console.log(`📦 Produto: ${doc.productName}, Stock: ${stock}, Sizes: ${sizes.join(', ')}, onSale: ${doc.onSale}, isNew: ${doc.isNew}`);
                 
                 return {
                     id: doc.$id,
@@ -81,6 +81,7 @@ async function loadProductsFromAppwrite() {
                     price: parseFloat(doc.price || 0),
                     sizes: sizes,
                     onSale: doc.onSale === true || doc.onSale === 'true',
+                    isNew: doc.isNew === true || doc.isNew === 'true',
                     image: imageUrl,
                     description: doc.description || (category === 'accessories' ? 
                         'Acessório versátil e elegante, perfeito para complementar qualquer look. Design moderno e atemporal, ideal para o dia a dia ou ocasiões especiais. Tamanho único ajustável.' : 
