@@ -45,7 +45,7 @@ try {
 
 // Função para obter URL da imagem do Storage
 function getImageUrl(fileId, width = 1200, quality = 95) {
-    if (!storage || !fileId) return 'imagem/IG.png';
+    if (!storage || !fileId) return 'imagem/IMG_20250926_220149.jpg';
     
     try {
         return storage.getFilePreview(
@@ -65,6 +65,6 @@ function getImageUrl(fileId, width = 1200, quality = 95) {
         );
     } catch (error) {
         console.error('Erro ao obter URL da imagem:', error);
-        return 'imagem/IG.png';
+        return 'imagem/IMG_20250926_220149.jpg';
     }
 }

@@ -1,7 +1,32 @@
 // ===== DADOS DOS PRODUTOS =====
 let sampleProducts = [];
 // Produtos carregados automaticamente do Appwrite
-const FALLBACK_IMAGE = 'imagem/IG.png';
+const FALLBACK_IMAGE = 'imagem/IMG_20250926_220149.jpg';
+
+function normalizeAppwriteImageUrl(url) {
+    if (typeof url !== 'string') return null;
+
+    const clean = url.trim();
+    if (!clean) return null;
+
+    // Alguns registos foram salvos com mode=admin (URL só de backend).
+    // Removemos esse parâmetro para gerar uma URL utilizável no browser.
+    if (/cloud\.appwrite\.io|fra\.cloud\.appwrite\.io/i.test(clean) && clean.includes('mode=admin')) {
+        try {
+            const parsed = new URL(clean);
+            parsed.searchParams.delete('mode');
+            return parsed.toString();
+        } catch (_) {
+            return clean.replace(/([?&])mode=admin(&?)/i, (match, prefix, suffix) => {
+                if (prefix === '?' && suffix) return '?';
+                if (suffix) return prefix;
+                return '';
+            }).replace(/[?&]$/, '');
+        }
+    }
+
+    return clean;
+}
 
 function resolveProductImage(doc) {
     const candidates = [
@@ -30,11 +55,15 @@ function resolveProductImage(doc) {
     if (!rawImage) return FALLBACK_IMAGE;
 
     if (typeof rawImage === 'string') {
-        const imageValue = rawImage.trim();
+        const imageValue = normalizeAppwriteImageUrl(rawImage);
         if (!imageValue) return FALLBACK_IMAGE;
 
         // Se já for URL/caminho válido, usar diretamente.
         if (/^https?:\/\//i.test(imageValue) || imageValue.startsWith('/') || imageValue.startsWith('imagem/')) {
+            const fileIdMatch = imageValue.match(/\/files\/([^\/\?]+)\//i);
+            if (fileIdMatch && fileIdMatch[1] && typeof getImageUrl === 'function') {
+                return getImageUrl(fileIdMatch[1]);
+            }
             return imageValue;
         }
 
@@ -533,7 +562,7 @@ function createProductCard(product) {
                  alt="${product.title}" 
                  class="thumb-img" 
                  loading="lazy"
-                  onerror="this.onerror=null;this.src='imagem/IG.png';">
+                 onerror="this.onerror=null;this.src='imagem/IMG_20250926_220149.jpg';">
             <div class="product-overlay">
                 <span class="view-details">Ver detalhes</span>
             </div>
@@ -831,7 +860,7 @@ function openProductModal(productId) {
                     <img src="${product.image}" 
                          alt="${product.title}" 
                          class="modal-image"
-                        onerror="this.onerror=null;this.src='imagem/IG.png';">
+                         onerror="this.onerror=null;this.src='imagem/IMG_20250926_220149.jpg';">
                     ${product.isNew ? '<span class="product-badge badge-new">Novo</span>' : ''}
                     ${product.onSale ? '<span class="product-badge badge-sale">Promoção</span>' : ''}
                 </div>
