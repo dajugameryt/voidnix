@@ -1,6 +1,39 @@
 // ===== DADOS DOS PRODUTOS =====
 let sampleProducts = [];
 // Produtos carregados automaticamente do Appwrite
+const FALLBACK_IMAGE = 'imagem/IG.png';
+
+function resolveProductImage(doc) {
+    const imageField = doc?.Image;
+    const rawImage = Array.isArray(imageField) ? imageField[0] : imageField;
+
+    if (!rawImage) return FALLBACK_IMAGE;
+
+    if (typeof rawImage === 'string') {
+        const imageValue = rawImage.trim();
+        if (!imageValue) return FALLBACK_IMAGE;
+
+        // Se já for URL/caminho válido, usar diretamente.
+        if (/^https?:\/\//i.test(imageValue) || imageValue.startsWith('/') || imageValue.startsWith('imagem/')) {
+            return imageValue;
+        }
+
+        // Caso contrário, assumir fileId do Appwrite Storage.
+        if (typeof getImageUrl === 'function') {
+            return getImageUrl(imageValue);
+        }
+
+        return FALLBACK_IMAGE;
+    }
+
+    if (typeof rawImage === 'object') {
+        if (rawImage.href) return rawImage.href;
+        if (rawImage.$id && typeof getImageUrl === 'function') return getImageUrl(rawImage.$id);
+        if (rawImage.fileId && typeof getImageUrl === 'function') return getImageUrl(rawImage.fileId);
+    }
+
+    return FALLBACK_IMAGE;
+}
 
 // ===== TABELA DE MEDIDAS (em cm) =====
 const sizeMeasurements = {
@@ -55,8 +88,7 @@ async function loadProductsFromAppwrite() {
         
         if (response.documents.length > 0) {
             sampleProducts = response.documents.map(doc => {
-                // Obter URL da imagem (campo Image é um array de URLs)
-                const imageUrl = doc.Image && doc.Image.length > 0 ? doc.Image[0] : 'https://via.placeholder.com/400';
+                const imageUrl = resolveProductImage(doc);
                 
                 // Normalizar categoria (aceitar woman ou women)
                 let category = doc.category ? doc.category.toLowerCase() : 'men';
@@ -479,7 +511,7 @@ function createProductCard(product) {
                  alt="${product.title}" 
                  class="thumb-img" 
                  loading="lazy"
-                 onerror="this.src='imagem/placeholder.jpg'">
+                  onerror="this.onerror=null;this.src='imagem/IG.png';">
             <div class="product-overlay">
                 <span class="view-details">Ver detalhes</span>
             </div>
@@ -777,7 +809,7 @@ function openProductModal(productId) {
                     <img src="${product.image}" 
                          alt="${product.title}" 
                          class="modal-image"
-                         onerror="this.src='imagem/placeholder.jpg'">
+                        onerror="this.onerror=null;this.src='imagem/IG.png';">
                     ${product.isNew ? '<span class="product-badge badge-new">Novo</span>' : ''}
                     ${product.onSale ? '<span class="product-badge badge-sale">Promoção</span>' : ''}
                 </div>
