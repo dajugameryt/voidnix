@@ -4,8 +4,28 @@ let sampleProducts = [];
 const FALLBACK_IMAGE = 'imagem/IG.png';
 
 function resolveProductImage(doc) {
-    const imageField = doc?.Image;
-    const rawImage = Array.isArray(imageField) ? imageField[0] : imageField;
+    const candidates = [
+        doc?.Image,
+        doc?.image,
+        doc?.images,
+        doc?.imageUrl,
+        doc?.imageURL,
+        doc?.imageId,
+        doc?.fileId,
+        doc?.imageFileId
+    ];
+
+    let rawImage = null;
+    for (const candidate of candidates) {
+        if (Array.isArray(candidate) && candidate.length > 0) {
+            rawImage = candidate[0];
+            break;
+        }
+        if (candidate !== undefined && candidate !== null && candidate !== '') {
+            rawImage = candidate;
+            break;
+        }
+    }
 
     if (!rawImage) return FALLBACK_IMAGE;
 
@@ -27,7 +47,9 @@ function resolveProductImage(doc) {
     }
 
     if (typeof rawImage === 'object') {
+        if (rawImage.url) return rawImage.url;
         if (rawImage.href) return rawImage.href;
+        if (rawImage.imageUrl) return rawImage.imageUrl;
         if (rawImage.$id && typeof getImageUrl === 'function') return getImageUrl(rawImage.$id);
         if (rawImage.fileId && typeof getImageUrl === 'function') return getImageUrl(rawImage.fileId);
     }
